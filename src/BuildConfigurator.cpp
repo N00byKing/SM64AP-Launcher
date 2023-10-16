@@ -8,9 +8,6 @@
 
 #include "MainWindow.h"
 
-constexpr int window_w = 530;
-constexpr int window_h = 500;
-
 std::string window_title_base = "Build Configurator - ";
 
 BuildConfigurator::BuildConfigurator(QWidget* parent, bool advanced) : QWidget(parent, Qt::Window) {
@@ -34,6 +31,8 @@ void BuildConfigurator::setLocations() {
     target_directory_button.setGeometry(30,110,180,30);
     target_directory_button_label.setGeometry(300, 110,180,30);
     target_directory_selected_label.setGeometry(30,150,500,30);
+    name_select.setGeometry(30,190,250,30);
+    name_select_label.setGeometry(300, 190, 180, 30);
 }
 
 void BuildConfigurator::setAdvanced(bool enabled) {

@@ -7,9 +7,6 @@
 #include <QWidget>
 #include <memory>
 
-constexpr int window_w = 1000;
-constexpr int window_h = 300;
-
 static auto main_win = nullptr;
 
 MainWindow::MainWindow() {
