@@ -5,7 +5,6 @@
 RequirementHandler::RequirementHandler(QWidget* parent, bool advanced) : QWidget(parent) {
     // Init default
     setLocations();
-    setAdvanced(false);
     setFixedSize(window_w,window_h);
     setAdvanced(advanced);
 }

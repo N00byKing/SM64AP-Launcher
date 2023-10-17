@@ -12,7 +12,6 @@ std::string window_title_base = "Build Configurator - ";
 BuildConfigurator::BuildConfigurator(QWidget* parent, bool advanced) : QWidget(parent, Qt::Window) {
     // Init default
     setLocations();
-    setAdvanced(false);
     setFixedSize(window_w,window_h);
     setAdvanced(advanced);
 
