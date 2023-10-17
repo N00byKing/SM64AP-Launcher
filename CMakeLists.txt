@@ -20,3 +20,17 @@ target_include_directories(SM64APLauncher PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/inc
 set_target_properties(SM64APLauncher PROPERTIES
     WIN32_EXECUTABLE ON
 )
+
+install(FILES $<TARGET_FILE:SM64APLauncher> DESTINATION SM64APLauncher_install)
+
+if(CMAKE_HOST_WIN32)
+    add_custom_command(
+        TARGET SM64APLauncher POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_CURRENT_BINARY_DIR}/launcher_deploy
+        COMMAND windeployqt.exe --release --compiler-runtime --dir ${CMAKE_CURRENT_BINARY_DIR}/launcher_deploy $<TARGET_FILE:SM64APLauncher>
+    )
+    install(
+        DIRECTORY ${CMAKE_BINARY_DIR}/launcher_deploy/
+        DESTINATION SM64APLauncher_install
+    )
+endif()
