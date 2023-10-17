@@ -6,12 +6,16 @@ project(SM64AP-Launcher LANGUAGES CXX VERSION 0.0.1)
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
 qt_standard_project_setup()
 
+execute_process(COMMAND git log --pretty=format:%h -n 1 OUTPUT_VARIABLE GIT_REV)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/inc/version.h.in ${CMAKE_CURRENT_SOURCE_DIR}/inc/version.h)
+
 qt_add_executable(SM64APLauncher
     src/main.cpp
     src/MainWindow.cpp
     src/BuildConfigurator.cpp
-    src/LogWindow.cpp
+    src/LogManager.cpp
     src/RequirementHandler.cpp
+    src/ConfigManager.cpp
 )
 
 target_link_libraries(SM64APLauncher PRIVATE Qt6::Core Qt6::Widgets)

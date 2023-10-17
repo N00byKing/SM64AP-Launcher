@@ -5,10 +5,11 @@
 #include <QWidget>
 #include <QLabel>
 #include <QPushButton>
+#include <QTextEdit>
 
 class BuildConfigurator : public QWidget {
     public:
-        static constexpr int window_w = 530;
+        static constexpr int window_w = 1100;
         static constexpr int window_h = 500;
         BuildConfigurator(QWidget*,bool);
     private:
@@ -23,9 +24,13 @@ class BuildConfigurator : public QWidget {
         QLabel target_directory_selected_label{"⟶ Currently none selected", this};
         QLineEdit name_select{"", this};
         QLabel name_select_label{"Name for this build", this};
+        QPushButton download_files{"Download Files", this};
+        QLabel download_files_label{"Confirm Repo and Branch\nand start downloading the files", this};
+        QTextEdit subprocess_output{this};
 
         void setLocations();
         void setAdvanced(bool);
         void closeEvent(QCloseEvent*);
         void selectTargetDirectory();
+        void confirmAndDownloadRepo();
 };
