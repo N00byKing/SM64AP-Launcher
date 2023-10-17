@@ -43,11 +43,11 @@ void RequirementHandler::checkRequirements() {
     if (!QFile::exists(msys_dir + QDir::separator() + "usr" + QDir::separator() + "bin" + QDir::separator() + "bash.exe")) {
         QMessageBox::StandardButton answer = QMessageBox::question(this, "MSYS not installed or corrupted", "MSYS was not found at the specified location. Attempt reinstall? This will install MSYS at the default location.");
         if (answer == QMessageBox::StandardButton::Ok) {
-            #warning TODO automatic downloading of MSYS
+            // TODO automatic downloading of MSYS
         }
         return;
     }
-    #warning install requirements
+    // TODO install requirements
 }
 
 void RequirementHandler::closeEvent(QCloseEvent *event) {
