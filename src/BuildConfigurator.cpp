@@ -4,7 +4,6 @@
 #include <Qt>
 #include <QFileDialog>
 #include <QPushButton>
-#include <qfiledialog.h>
 
 #include "MainWindow.h"
 
@@ -41,8 +40,8 @@ void BuildConfigurator::setAdvanced(bool enabled) {
 }
 
 void BuildConfigurator::closeEvent(QCloseEvent *event) {
-    ((MainWindow*)parentWidget())->show();
-    this->deleteLater();
+    parentWidget()->show();
+    // No need to delete now. MainWindow will, either on close or on regen
 }
 
 void BuildConfigurator::selectTargetDirectory() {

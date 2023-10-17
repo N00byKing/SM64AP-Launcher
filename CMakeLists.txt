@@ -14,6 +14,8 @@ qt_add_executable(SM64APLauncher
     inc/BuildConfigurator.h
     src/LogWindow.cpp
     inc/LogWindow.h
+    src/RequirementHandler.cpp
+    inc/RequirementHandler.h
 )
 
 target_link_libraries(SM64APLauncher PRIVATE Qt6::Core Qt6::Widgets)

@@ -23,12 +23,6 @@ MainWindow::MainWindow() {
     QObject::connect(&create_custom_build, &QPushButton::released, this, &MainWindow::spawnAdvancedConfigurator);
 }
 
-void MainWindow::show() {
-    if (configurator) configurator->deleteLater();
-    configurator.release();
-    QWidget::show();
-}
-
 void MainWindow::setLocations() {
     create_default_build.setGeometry(550,100,200,30);
     create_custom_build.setGeometry(550,140,200,30);
