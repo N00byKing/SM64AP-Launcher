@@ -6,6 +6,7 @@
 #include <memory>
 
 #include "BuildConfigurator.h"
+#include "RequirementHandler.h"
 
 class MainWindow : public QWidget {
     public:
@@ -16,11 +17,15 @@ class MainWindow : public QWidget {
         using QWidget::QWidget;
         QPushButton create_default_build{"Compile default SM64AP build", this};
         QPushButton create_custom_build{"Compile custom build", this};
+        QPushButton recheck_requirements{"Re-check requirements", this};
         QCheckBox use_advanced{"Show advanced options", this};
         std::unique_ptr<BuildConfigurator> configurator;
+        std::unique_ptr<RequirementHandler> requirement_handler;
 
         void setLocations();
         void setAdvanced(bool);
+        void closeEvent(QCloseEvent *event);
         void spawnDefaultConfigurator();
         void spawnAdvancedConfigurator();
+        void spawnRequirementHandler();
 };

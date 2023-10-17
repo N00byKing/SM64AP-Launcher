@@ -1,13 +1,12 @@
 #include "MainWindow.h"
 #include "BuildConfigurator.h"
+#include "RequirementHandler.h"
 
 #include <QApplication>
 #include <QPushButton>
 #include <QCheckBox>
 #include <QWidget>
 #include <memory>
-
-static auto main_win = nullptr;
 
 MainWindow::MainWindow() {
     // Init default
@@ -21,11 +20,13 @@ MainWindow::MainWindow() {
     QObject::connect(&use_advanced, &QCheckBox::toggled, this, &MainWindow::setAdvanced);
     QObject::connect(&create_default_build, &QPushButton::released, this, &MainWindow::spawnDefaultConfigurator);
     QObject::connect(&create_custom_build, &QPushButton::released, this, &MainWindow::spawnAdvancedConfigurator);
+    QObject::connect(&recheck_requirements, &QPushButton::released, this, &MainWindow::spawnRequirementHandler);
 }
 
 void MainWindow::setLocations() {
     create_default_build.setGeometry(550,100,200,30);
     create_custom_build.setGeometry(550,140,200,30);
+    recheck_requirements.setGeometry(550,180,200,30);
     use_advanced.setGeometry(555, 270, 200, 30);
 }
 
@@ -36,11 +37,23 @@ void MainWindow::setAdvanced(bool enable) {
 void MainWindow::spawnDefaultConfigurator() {
     configurator = std::make_unique<BuildConfigurator>(this,false);
     configurator->show();
-    this->setVisible(false);
+    this->hide();
 }
 
 void MainWindow::spawnAdvancedConfigurator() {
     configurator = std::make_unique<BuildConfigurator>(this,true);
     configurator->show();
-    this->setVisible(false);
+    this->hide();
+}
+
+void MainWindow::spawnRequirementHandler() {
+    requirement_handler = std::make_unique<RequirementHandler>(this,use_advanced.isChecked());
+    requirement_handler->show();
+    this->hide();
+}
+
+void MainWindow::closeEvent(QCloseEvent *event) {
+    // System quit. Destroy stuff on the way out
+    configurator.reset();
+    requirement_handler.reset();
 }

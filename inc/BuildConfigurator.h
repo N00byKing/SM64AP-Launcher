@@ -23,7 +23,6 @@ class BuildConfigurator : public QWidget {
         QLabel target_directory_selected_label{"⟶ Currently none selected", this};
         QLineEdit name_select{"", this};
         QLabel name_select_label{"Name for this build", this};
-        
 
         void setLocations();
         void setAdvanced(bool);
