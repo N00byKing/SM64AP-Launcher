@@ -9,6 +9,9 @@
 #include "ConfigManager.h"
 
 RequirementHandler::RequirementHandler(QWidget* parent, bool advanced) : QWidget(parent, Qt::Window) {
+    // Load config
+    msys_select.setText(Config::getMSYSPath());
+
     // Init default
     setLocations();
     setFixedSize(window_w,window_h);
@@ -51,6 +54,7 @@ void RequirementHandler::checkRequirements() {
         }
         return;
     }
+    Config::setMSYSPath(msys_dir);
     // TODO install requirements
 }
 
