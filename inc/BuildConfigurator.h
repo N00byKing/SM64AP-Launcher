@@ -12,6 +12,12 @@ class BuildConfigurator : public QWidget {
         static constexpr int window_w = 1100;
         static constexpr int window_h = 500;
         BuildConfigurator(QWidget*,bool);
+        struct SM64_Build {
+            QString name;
+            QString repo;
+            QString branch;
+            QString directory;
+        };
     private:
         using QWidget::QWidget;
 

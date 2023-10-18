@@ -17,6 +17,7 @@ class RequirementHandler : public QWidget {
         QLabel msys_select_label{"Path to MSYS installation",this};
         QPushButton check_requirements{"Check requirements",this};
         QLabel troubleshooting_label{"Troubleshooting",this};
+        QPushButton rewrite_config{"Re-write config",this};
         QPushButton reinstall_msys{"Re-install MSYS",this};
         QPushButton reinstall_dependencies{"Re-install Dependencies",this};
         void closeEvent(QCloseEvent *event);

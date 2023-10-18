@@ -6,6 +6,8 @@
 #include <QDir>
 #include <QMessageBox>
 
+#include "ConfigManager.h"
+
 RequirementHandler::RequirementHandler(QWidget* parent, bool advanced) : QWidget(parent, Qt::Window) {
     // Init default
     setLocations();
@@ -16,15 +18,17 @@ RequirementHandler::RequirementHandler(QWidget* parent, bool advanced) : QWidget
 
     // Connect things
     QObject::connect(&check_requirements, &QPushButton::released, this, &RequirementHandler::checkRequirements);
+    QObject::connect(&rewrite_config, &QPushButton::released, this, &Config::writeConfig);
 }
 
 void RequirementHandler::setLocations() {
     msys_select.setGeometry(30,30,250,30);
     msys_select_label.setGeometry(300,30,180,30);
     check_requirements.setGeometry(30,70,250,30);
-    troubleshooting_label.setGeometry(30,110,250,30);
-    reinstall_msys.setGeometry(30,150,250,30);
-    reinstall_dependencies.setGeometry(30,190,250,30);
+    troubleshooting_label.setGeometry(30,110,180,30);
+    rewrite_config.setGeometry(30,150,250,30);
+    reinstall_msys.setGeometry(30,190,250,30);
+    reinstall_dependencies.setGeometry(30,230,250,30);
 }
 
 void RequirementHandler::setAdvanced(bool enabled) {
