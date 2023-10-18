@@ -41,9 +41,15 @@ bool initConfig() {
     }
     config = config_doc.object();
     config["version"] = QString(GIT_REV);
+    if (first_run) resetToDefault();
     writeConfig();
     config_file.close();
     return true;
+}
+
+void resetToDefault() {
+    setAdvanced(false);
+    setMSYSPath(default_msys_path);
 }
 
 void setAdvanced(bool enable) {
@@ -52,6 +58,14 @@ void setAdvanced(bool enable) {
 
 bool isAdvanced() {
     return config["advanced"].toBool();
+}
+
+void setMSYSPath(QString path) {
+    config["msys_path"] = path;
+}
+
+QString getMSYSPath() {
+    return config["msys_path"].toString();
 }
 
 }

@@ -10,6 +10,7 @@ QProcess subprocess;
 
 #ifdef WIN32
 void runProcess() {
+    QString msys_path = Config::getMSYSPath();
     //subprocess.setProgram();
 }
 #else
