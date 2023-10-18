@@ -12,6 +12,7 @@ namespace Config {
 
 QFile config_file{"config.json",nullptr};
 QJsonObject config;
+bool first_run = false;
 
 void writeConfig() {
     if (!config_file.open(QIODeviceBase::WriteOnly | QIODeviceBase::Truncate)) {
@@ -22,8 +23,9 @@ void writeConfig() {
     config_file.close();
 }
 
+bool isFirstRun() { return first_run; }
+
 bool initConfig() {
-    bool first_run = false;
     if (!config_file.exists()) { first_run = true; }
     if (!config_file.open(QIODeviceBase::ReadWrite)) {
         QMessageBox::critical(nullptr, "Could not read/write config file", "The config file is inaccessible.\nMake sure config.json is not write-protected or opened by another program.\nThe launcher will now exit.");

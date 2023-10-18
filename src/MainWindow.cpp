@@ -13,6 +13,7 @@
 MainWindow::MainWindow() {
     // Load config
     use_advanced.setChecked(Config::isAdvanced());
+    show_require_firstrun = Config::isFirstRun();
 
     // Init default
     setLocations();
@@ -54,8 +55,9 @@ void MainWindow::spawnAdvancedConfigurator() {
 
 void MainWindow::spawnRequirementHandler() {
     requirement_handler = std::make_unique<RequirementHandler>(this,use_advanced.isChecked());
+    this->setEnabled(false);
+    requirement_handler->setEnabled(true);
     requirement_handler->show();
-    this->hide();
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
@@ -63,4 +65,13 @@ void MainWindow::closeEvent(QCloseEvent *event) {
     Config::writeConfig();
     configurator.reset();
     requirement_handler.reset();
+}
+
+void MainWindow::showEvent(QShowEvent *event) {
+    if (Config::isFirstRun() && show_require_firstrun) {
+        show_require_firstrun = false;
+        spawnRequirementHandler();
+    } else {
+        event->accept();
+    }
 }

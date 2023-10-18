@@ -14,7 +14,6 @@ int main(int argc, char **argv) {
     }
 
     MainWindow main_win;
-
     main_win.show();
 
     return app.exec();

@@ -55,6 +55,6 @@ void RequirementHandler::checkRequirements() {
 }
 
 void RequirementHandler::closeEvent(QCloseEvent *event) {
-    parentWidget()->show();
+    parentWidget()->setEnabled(true);
     // No need to delete now. MainWindow will, either on close or on regen
 }
