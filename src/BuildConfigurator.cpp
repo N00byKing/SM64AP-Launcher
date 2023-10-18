@@ -5,10 +5,12 @@
 #include <QFileDialog>
 #include <QPushButton>
 #include <QMessageBox>
+#include <QCoreApplication>
 #include <string>
 
 #include "MainWindow.h"
 #include "LogManager.h"
+#include "PlatformRunner.h"
 
 std::string window_title_base = "Build Configurator - ";
 
@@ -68,16 +70,22 @@ void BuildConfigurator::confirmAndDownloadRepo() {
     if (!target_dir.isEmpty()) { QMessageBox::critical(this, "Invalid Target Directory", "The directory you selected is not empty."); return;}
     if (name_select.text().isEmpty()) { QMessageBox::critical(this, "Invalid Build Name", "You have not entered a build name"); return; }
     // Disable Window functions
-    repo_select.setEnabled(false);
-    branch_select.setEnabled(false);
-    target_directory_button.setEnabled(false);
-    name_select.setEnabled(false);
-    download_files.setEnabled(false);
+    this->setEnabled(false);
+    subprocess_output.setEnabled(true);
+    // Create build struct
+    SM64_Build build = {
+        name_select.text(),
+        repo_select.text(),
+        branch_select.text(),
+        target_directory_selected_label.text()
+    };
     // Log
     writeToLog("### New build requested, data start ###");
-    writeToLog("Repository: " + repo_select.text().toStdString());
-    writeToLog("Branch: " + branch_select.text().toStdString());
-    writeToLog("Target Directory: " + target_dir.absolutePath().toStdString());
-    writeToLog("Build Name: " + name_select.text().toStdString());
-    writeToLog("### Data end ###");
+    writeToLog("Repository: " + build.repo);
+    writeToLog("Branch: " + build.branch);
+    writeToLog("Target Directory: " + build.directory);
+    writeToLog("Build Name: " + build.name);
+    writeToLog("### Data end, starting download ###");
+    // START DOWNLOAD
+    PlatformRunner::runProcess(QCoreApplication::applicationDirPath() + "/presets/repo_dl.sh", &subprocess_output, build);
 }

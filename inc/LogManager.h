@@ -4,6 +4,6 @@
 #include <QTextEdit>
 
 void initLogs();
-void writeToLog(std::string line);
+void writeToLog(QString line);
 void forkLogTo(QTextEdit* textedit);
 void unlinkFork();

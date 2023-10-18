@@ -47,7 +47,7 @@ void RequirementHandler::checkRequirements() {
         QMessageBox::critical(this,"Invalid MSYS Path", "The given MSYS path contains spaces. This is not allowed.");
         return;
     }
-    if (!QFile::exists(msys_dir + QDir::separator() + "usr" + QDir::separator() + "bin" + QDir::separator() + "bash.exe")) {
+    if (!QFile::exists(msys_dir + "/usr/bin/bash.exe")) {
         QMessageBox::StandardButton answer = QMessageBox::question(this, "MSYS not installed or corrupted", "MSYS was not found at the specified location. Attempt reinstall? This will install MSYS at the default location.");
         if (answer == QMessageBox::StandardButton::Ok) {
             // TODO automatic downloading of MSYS

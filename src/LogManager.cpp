@@ -3,6 +3,7 @@
 #include <QMessageBox>
 #include <QTextEdit>
 #include <QFile>
+#include <QString>
 
 #include "version.h"
 
@@ -21,9 +22,9 @@ void initLogs() {
 void forkLogTo(QTextEdit* textedit) { forklog = textedit; }
 void unlinkFork() { forklog = nullptr; }
 
-void writeToLog(std::string line) {
-    logs.write((line + "\n").c_str());
+void writeToLog(QString line) {
+    logs.write((line + "\n").toStdString().c_str());
     if (forklog) {
-        forklog->append(line.c_str());
+        forklog->append(line);
     }
 }
