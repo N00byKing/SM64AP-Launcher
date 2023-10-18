@@ -12,7 +12,7 @@ QTextEdit* forklog = nullptr;
 
 void initLogs() {
     if (!logs.open(QIODeviceBase::Truncate | QIODeviceBase::ReadWrite)) {
-            QMessageBox::critical(nullptr, "bruh", "bruh");
+            QMessageBox::critical(nullptr, "Could not open Log", "The log file is inaccessible. This may indicate further issues.");
     }
     logs.write("SM64APLauncher, commit " GIT_REV "\n");
     logs.flush();

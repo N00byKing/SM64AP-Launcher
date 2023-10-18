@@ -19,6 +19,7 @@ qt_add_executable(SM64APLauncher
     src/PlatformRunner.cpp
 )
 
+# Linking
 target_link_libraries(SM64APLauncher PRIVATE Qt6::Core Qt6::Widgets)
 target_include_directories(SM64APLauncher PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/inc)
 
