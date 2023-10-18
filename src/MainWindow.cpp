@@ -3,6 +3,7 @@
 #include <QApplication>
 #include <QPushButton>
 #include <QCheckBox>
+#include <QShowEvent>
 #include <QWidget>
 #include <memory>
 
