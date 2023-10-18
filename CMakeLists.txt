@@ -16,6 +16,7 @@ qt_add_executable(SM64APLauncher
     src/LogManager.cpp
     src/RequirementHandler.cpp
     src/ConfigManager.cpp
+    src/PlatformRunner.cpp
 )
 
 target_link_libraries(SM64APLauncher PRIVATE Qt6::Core Qt6::Widgets)
