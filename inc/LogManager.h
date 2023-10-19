@@ -1,9 +1,12 @@
 #pragma once
 
-#include <string>
-#include <QTextEdit>
+#include <QString>
 
-void initLogs();
-void writeToLog(QString line);
-void forkLogTo(QTextEdit* textedit);
-void unlinkFork();
+#include "BuildConfigurator.h"
+
+namespace LogManager {
+    void initLogs();
+    void writeToLog(QString line);
+    void forkLogTo(BuildConfigurator* bconfig);
+    void unlinkFork();
+}

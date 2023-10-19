@@ -7,7 +7,7 @@
 int main(int argc, char **argv) {
     QApplication app(argc, argv);
 
-    initLogs();
+    LogManager::initLogs();
     if (!Config::initConfig()) {
         app.exit(1);
         return 1;

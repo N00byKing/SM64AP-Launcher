@@ -1,15 +1,17 @@
 #include "LogManager.h"
 
 #include <QMessageBox>
-#include <QTextEdit>
 #include <QFile>
 #include <QString>
 
+#include "BuildConfigurator.h"
 #include "version.h"
+
+namespace LogManager {
 
 bool is_init = false;
 QFile logs{"logs.txt", nullptr};
-QTextEdit* forklog = nullptr;
+BuildConfigurator* forklog = nullptr;
 
 void initLogs() {
     if (!logs.open(QIODeviceBase::Truncate | QIODeviceBase::ReadWrite)) {
@@ -19,12 +21,14 @@ void initLogs() {
     logs.flush();
 }
 
-void forkLogTo(QTextEdit* textedit) { forklog = textedit; }
+void forkLogTo(BuildConfigurator* textedit) { forklog = textedit; }
 void unlinkFork() { forklog = nullptr; }
 
 void writeToLog(QString line) {
-    logs.write((line + "\n").toStdString().c_str());
+    logs.write(line.toStdString().c_str());
     if (forklog) {
-        forklog->append(line);
+        forklog->printToUser(line);
     }
+}
+
 }

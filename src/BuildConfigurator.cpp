@@ -6,6 +6,8 @@
 #include <QPushButton>
 #include <QMessageBox>
 #include <QCoreApplication>
+#include <QFontDatabase>
+#include <functional>
 #include <string>
 
 #include "MainWindow.h"
@@ -27,7 +29,7 @@ BuildConfigurator::BuildConfigurator(QWidget* parent, bool advanced) : QWidget(p
     QObject::connect(&download_files, &QPushButton::released, this, &BuildConfigurator::confirmAndDownloadRepo);
 
     // Link logs to output
-    forkLogTo(&subprocess_output);
+    LogManager::forkLogTo(this);
 };
 
 void BuildConfigurator::setLocations() {
@@ -43,6 +45,9 @@ void BuildConfigurator::setLocations() {
     download_files.setGeometry(30,230,180,30);
     download_files_label.setGeometry(300,230,180,30);
     subprocess_output.setGeometry(500,30,570,400);
+    const QFont fixedFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+    subprocess_output.setFont(fixedFont);
+    subprocess_output.setLineWrapMode(QPlainTextEdit::NoWrap);
     subprocess_output.setReadOnly(true);
 }
 
@@ -52,7 +57,7 @@ void BuildConfigurator::setAdvanced(bool enabled) {
 }
 
 void BuildConfigurator::closeEvent(QCloseEvent *event) {
-    unlinkFork();
+    LogManager::unlinkFork();
     parentWidget()->show();
     // No need to delete now. MainWindow will, either on close or on regen
 }
@@ -70,8 +75,7 @@ void BuildConfigurator::confirmAndDownloadRepo() {
     if (!target_dir.isEmpty()) { QMessageBox::critical(this, "Invalid Target Directory", "The directory you selected is not empty."); return;}
     if (name_select.text().isEmpty()) { QMessageBox::critical(this, "Invalid Build Name", "You have not entered a build name"); return; }
     // Disable Window functions
-    this->setEnabled(false);
-    subprocess_output.setEnabled(true);
+    disableDLInput();
     // Create build struct
     SM64_Build build = {
         name_select.text(),
@@ -80,12 +84,31 @@ void BuildConfigurator::confirmAndDownloadRepo() {
         target_directory_selected_label.text()
     };
     // Log
-    writeToLog("### New build requested, data start ###");
-    writeToLog("Repository: " + build.repo);
-    writeToLog("Branch: " + build.branch);
-    writeToLog("Target Directory: " + build.directory);
-    writeToLog("Build Name: " + build.name);
-    writeToLog("### Data end, starting download ###");
+    LogManager::writeToLog("### New build requested, data start ###\n");
+    LogManager::writeToLog("Repository: " + build.repo + "\n");
+    LogManager::writeToLog("Branch: " + build.branch  + "\n");
+    LogManager::writeToLog("Target Directory: " + build.directory  + "\n");
+    LogManager::writeToLog("Build Name: " + build.name  + "\n");
+    LogManager::writeToLog("### Data end, starting download ###\n");
     // START DOWNLOAD
-    PlatformRunner::runProcess(QCoreApplication::applicationDirPath() + "/presets/repo_dl.sh", &subprocess_output, build);
+    std::function<void(int)> callback = std::bind(&BuildConfigurator::DLfinishCallback, this, std::placeholders::_1);
+    PlatformRunner::runProcess(QCoreApplication::applicationDirPath() + "/presets/repo_dl.sh", build, callback);
+}
+
+void BuildConfigurator::printToUser(QString str) {
+    subprocess_output.moveCursor (QTextCursor::End);
+    subprocess_output.insertPlainText (str);
+    subprocess_output.moveCursor (QTextCursor::End);
+}
+
+void BuildConfigurator::DLfinishCallback(int exitcode) {
+    this->setEnabled(true);
+}
+
+void BuildConfigurator::disableDLInput() {
+    repo_select.setEnabled(false);
+    branch_select.setEnabled(false);
+    target_directory_button.setEnabled(false);
+    name_select.setEnabled(false);
+    download_files.setEnabled(false);
 }

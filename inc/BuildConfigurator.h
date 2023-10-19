@@ -5,7 +5,7 @@
 #include <QWidget>
 #include <QLabel>
 #include <QPushButton>
-#include <QTextEdit>
+#include <QPlainTextEdit>
 
 class BuildConfigurator : public QWidget {
     public:
@@ -18,6 +18,7 @@ class BuildConfigurator : public QWidget {
             QString branch;
             QString directory;
         };
+        void printToUser(QString str);
     private:
         using QWidget::QWidget;
 
@@ -32,11 +33,13 @@ class BuildConfigurator : public QWidget {
         QLabel name_select_label{"Name for this build", this};
         QPushButton download_files{"Download Files", this};
         QLabel download_files_label{"Confirm Repo and Branch\nand start downloading the files", this};
-        QTextEdit subprocess_output{this};
+        QPlainTextEdit subprocess_output{this};
 
         void setLocations();
         void setAdvanced(bool);
         void closeEvent(QCloseEvent*);
         void selectTargetDirectory();
         void confirmAndDownloadRepo();
+        void DLfinishCallback(int);
+        void disableDLInput();
 };

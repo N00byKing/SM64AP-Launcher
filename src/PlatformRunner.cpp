@@ -3,47 +3,54 @@
 #include <QProcess>
 #include <QDir>
 #include <QStringList>
-#include <QTextEdit>
-#include <QMessageBox>
 #include <QObject>
+#include <functional>
 #include <string>
 
-#include "BuildConfigurator.h"
+#include "LogManager.h"
 #include "ConfigManager.h"
 
 namespace PlatformRunner {
 
 QProcess subprocess;
-QTextEdit* output = nullptr;
 
-void writeToOutput() {
-    if (output) {
-        output->append(subprocess.readLine());
+std::function<void(int)> finishCallback = nullptr;
+
+void stdout_writeToOutput() {
+    LogManager::writeToLog(subprocess.readAllStandardOutput());
+}
+void stderr_writeToOutput() {
+    LogManager::writeToLog(subprocess.readAllStandardError());
+}
+
+
+void handleProcessFinished(int exitcode) {
+    if (finishCallback) {
+        finishCallback(exitcode);
     }
 }
 
-void handleProcessError(QProcess::ProcessError err) {
-    QMessageBox::critical(nullptr, "Subprocess error", QString("Subprocess error occurred: ") + QChar(err));
-}
-
-#ifdef WIN32
-void runProcess(QString cmd, QTextEdit* output, BuildConfigurator::SM64_Build build) {
+void runProcess(QString cmd, BuildConfigurator::SM64_Build build, std::function<void(int)> pfinishCallback) {
+    #ifdef WIN32
     QString msys_path = Config::getMSYSPath();
     subprocess.setProgram(msys_path + "/usr/bin/bash.exe");
-    subprocess.setArguments(QStringList() << "--login" << "-c" << "--" << cmd);
+    #else
+    subprocess.setProgram("/usr/bin/bash");
+    #endif
+    subprocess.setArguments(QStringList() << "-c" << "--" << cmd);
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
     env.insert("MSYSTEM", "MINGW64");
     env.insert("CHERE_INVOKING", "yes");
+    env.insert("BUILD_NAME", build.name);
     env.insert("BUILD_TARGET_DIR", build.directory);
     env.insert("BUILD_REPO_LINK", build.repo);
     env.insert("BUILD_BRANCH_NAME", build.branch);
     subprocess.setProcessEnvironment(env);
-    QObject::connect(&subprocess, &QProcess::canReadLine, &writeToOutput);
-    QObject::connect(&subprocess, &QProcess::errorOccurred, &handleProcessError);
+    QObject::connect(&subprocess, &QProcess::readyReadStandardOutput, &stdout_writeToOutput);
+    QObject::connect(&subprocess, &QProcess::readyReadStandardError, &stderr_writeToOutput);
+    QObject::connect(&subprocess, &QProcess::finished, &handleProcessFinished);
+    finishCallback = pfinishCallback;
     subprocess.start();
 }
-#else
-#error TODO linux
-#endif
 
 }

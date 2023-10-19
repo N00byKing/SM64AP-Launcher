@@ -1,10 +1,11 @@
 #pragma once
 
 #include <QString>
-#include <QTextEdit>
+#include <QPlainTextEdit>
+#include <functional>
 
 #include "BuildConfigurator.h"
 
 namespace PlatformRunner {
-    void runProcess(QString,QTextEdit*,BuildConfigurator::SM64_Build);
+    void runProcess(QString,BuildConfigurator::SM64_Build, std::function<void(int)> callback);
 }
