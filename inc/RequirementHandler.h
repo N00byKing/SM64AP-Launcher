@@ -6,6 +6,7 @@
 #include <QPushButton>
 
 #include "ConfigManager.h"
+#include "BuildConfigurator.h"
 
 class RequirementHandler : public QWidget {
     public:
@@ -22,8 +23,11 @@ class RequirementHandler : public QWidget {
         QPushButton rewrite_config{"Re-write config",this};
         QPushButton reinstall_msys{"Re-install MSYS",this};
         QPushButton reinstall_dependencies{"Re-install Dependencies",this};
+        QPushButton select_rom{"Register SM64 Rom",this};
         void closeEvent(QCloseEvent *event);
         void checkRequirements();
+        void registerROM();
         void setLocations();
         void setAdvanced(bool);
+        BuildConfigurator::SM64_Region identifyROM(QString);
 };

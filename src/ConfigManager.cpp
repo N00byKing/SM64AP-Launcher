@@ -50,6 +50,8 @@ bool initConfig() {
 void resetToDefault() {
     setAdvanced(false);
     setMSYSPath(default_msys_path);
+    setROMPath("_None",BuildConfigurator::SM64_Region::US);
+    setROMPath("_None",BuildConfigurator::SM64_Region::JP);
 }
 
 void setAdvanced(bool enable) {
@@ -66,6 +68,36 @@ void setMSYSPath(QString path) {
 
 QString getMSYSPath() {
     return config["msys_path"].toString();
+}
+
+void setROMPath(QString path, BuildConfigurator::SM64_Region region) {
+    QJsonObject rom_paths = config["rom_paths"].toObject();
+    switch (region) {
+        case BuildConfigurator::SM64_Region::US:
+            rom_paths["us"] = path;
+            break;
+        case BuildConfigurator::SM64_Region::JP:
+            rom_paths["jp"] = path;
+            break;
+        default:
+            break;
+    }
+    config["rom_paths"] = rom_paths;
+}
+
+QString getROMPath(BuildConfigurator::SM64_Region region) {
+    QJsonObject rom_paths = config["rom_paths"].toObject();
+    switch (region) {
+        case BuildConfigurator::SM64_Region::US:
+            return rom_paths["us"].toString();
+            break;
+        case BuildConfigurator::SM64_Region::JP:
+            return rom_paths["jp"].toString();
+            break;
+        default:
+            return "_None";
+            break;
+    }
 }
 
 }

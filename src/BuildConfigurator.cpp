@@ -1,6 +1,7 @@
 #include "BuildConfigurator.h"
 
 #include <QWidget>
+#include <QMainWindow>
 #include <Qt>
 #include <QFileDialog>
 #include <QPushButton>
@@ -16,7 +17,7 @@
 
 std::string window_title_base = "Build Configurator - ";
 
-BuildConfigurator::BuildConfigurator(QWidget* parent, bool advanced) : QWidget(parent, Qt::Window) {
+BuildConfigurator::BuildConfigurator(QWidget* parent, bool advanced) : QMainWindow(parent, Qt::Window) {
     // Init default
     setLocations();
     setFixedSize(window_w,window_h);
@@ -27,6 +28,7 @@ BuildConfigurator::BuildConfigurator(QWidget* parent, bool advanced) : QWidget(p
     // Connect things
     QObject::connect(&target_directory_button, &QPushButton::released, this, &BuildConfigurator::selectTargetDirectory);
     QObject::connect(&download_files, &QPushButton::released, this, &BuildConfigurator::confirmAndDownloadRepo);
+    QObject::connect(&start_compile, &QPushButton::released, this, &BuildConfigurator::compileBuild);
 
     // Link logs to output
     LogManager::forkLogTo(this);
@@ -49,6 +51,8 @@ void BuildConfigurator::setLocations() {
     subprocess_output.setFont(fixedFont);
     subprocess_output.setLineWrapMode(QPlainTextEdit::NoWrap);
     subprocess_output.setReadOnly(true);
+    start_compile.setGeometry(30,310,180,30);
+    start_compile.setEnabled(false);
 }
 
 void BuildConfigurator::setAdvanced(bool enabled) {
@@ -68,31 +72,43 @@ void BuildConfigurator::selectTargetDirectory() {
 }
 
 void BuildConfigurator::confirmAndDownloadRepo() {
-    // Target directory
-    QDir target_dir = target_directory_selected_label.text();
-    // Sanity Checks
-    if (!target_dir.exists()) { QMessageBox::critical(this, "Invalid Target Directory", "The directory you selected does not exist."); return;}
-    if (!target_dir.isEmpty()) { QMessageBox::critical(this, "Invalid Target Directory", "The directory you selected is not empty."); return;}
-    if (name_select.text().isEmpty()) { QMessageBox::critical(this, "Invalid Build Name", "You have not entered a build name"); return; }
-    // Disable Window functions
-    disableDLInput();
     // Create build struct
-    SM64_Build build = {
+    active_build = {
         name_select.text(),
         repo_select.text(),
         branch_select.text(),
-        target_directory_selected_label.text()
+        target_directory_selected_label.text(),
+        SM64_Region::Undef
     };
+    // Target directory
+    QDir target_dir = active_build.directory;
+    // Sanity Checks
+    if (!target_dir.exists()) { QMessageBox::critical(this, "Invalid Target Directory", "The directory you selected does not exist."); return;}
+    if (name_select.text().isEmpty()) { QMessageBox::critical(this, "Invalid Build Name", "You have not entered a build name"); return; }
+    QDir build_path = active_build.directory + "/" + active_build.name;
+    if (build_path.exists()) {
+        QMessageBox::StandardButton answer = QMessageBox::question(this, "Folder exists", "There already is a folder called '" + active_build.name + "' in the target directory.\nDo you want to remove it and continue?");
+        if (answer == QMessageBox::StandardButton::Yes) {
+            if (!build_path.removeRecursively()) {
+                QMessageBox::critical(this, "Could not remove folder", "The folder at '" + build_path.absolutePath() + "' could not be deleted!\nCheck if it is open in another program, or write protected.");
+                return;
+            }
+        } else {
+            return;
+        }
+    }
+    // Disable Window functions
+    disableDLInput();
     // Log
     LogManager::writeToLog("### New build requested, data start ###\n");
-    LogManager::writeToLog("Repository: " + build.repo + "\n");
-    LogManager::writeToLog("Branch: " + build.branch  + "\n");
-    LogManager::writeToLog("Target Directory: " + build.directory  + "\n");
-    LogManager::writeToLog("Build Name: " + build.name  + "\n");
+    LogManager::writeToLog("Repository: " + active_build.repo + "\n");
+    LogManager::writeToLog("Branch: " + active_build.branch  + "\n");
+    LogManager::writeToLog("Target Directory: " + active_build.directory  + "\n");
+    LogManager::writeToLog("Build Name: " + active_build.name  + "\n");
     LogManager::writeToLog("### Data end, starting download ###\n");
     // START DOWNLOAD
-    std::function<void(int)> callback = std::bind(&BuildConfigurator::DLfinishCallback, this, std::placeholders::_1);
-    PlatformRunner::runProcess(QCoreApplication::applicationDirPath() + "/presets/repo_dl.sh", build, callback);
+    std::function<void(int)> callback = std::bind(&BuildConfigurator::DLFinishCallback, this, std::placeholders::_1);
+    PlatformRunner::runProcess(QCoreApplication::applicationDirPath() + "/presets/repo_dl.sh", active_build, callback);
 }
 
 void BuildConfigurator::printToUser(QString str) {
@@ -101,8 +117,14 @@ void BuildConfigurator::printToUser(QString str) {
     subprocess_output.moveCursor (QTextCursor::End);
 }
 
-void BuildConfigurator::DLfinishCallback(int exitcode) {
+void BuildConfigurator::DLFinishCallback(int exitcode) {
     this->setEnabled(true);
+    if (exitcode == 0) {
+        LogManager::writeToLog("Repo downloaded successfully.\n");
+        start_compile.setEnabled(true);
+    } else {
+        QMessageBox::critical(this, "Download error", "Could not download repo!");
+    }
 }
 
 void BuildConfigurator::disableDLInput() {
@@ -111,4 +133,19 @@ void BuildConfigurator::disableDLInput() {
     target_directory_button.setEnabled(false);
     name_select.setEnabled(false);
     download_files.setEnabled(false);
+}
+
+void BuildConfigurator::compileBuild() {
+    disableCompileInput();
+    std::function<void(int)> callback = std::bind(&BuildConfigurator::CompileFinishCallback, this, std::placeholders::_1);
+    active_build.region = SM64_Region::US;
+    PlatformRunner::runProcess(QCoreApplication::applicationDirPath() + "/presets/compile_build.sh", active_build, callback);
+}
+
+void BuildConfigurator::disableCompileInput() {
+    start_compile.setEnabled(false);
+}
+
+void BuildConfigurator::CompileFinishCallback(int exitcode) {
+
 }
