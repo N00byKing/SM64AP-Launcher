@@ -11,6 +11,7 @@
 #include <functional>
 #include <string>
 
+#include "ConfigManager.h"
 #include "MainWindow.h"
 #include "LogManager.h"
 #include "PlatformRunner.h"
@@ -18,10 +19,18 @@
 std::string window_title_base = "Build Configurator - ";
 
 BuildConfigurator::BuildConfigurator(QWidget* parent, bool advanced) : QMainWindow(parent, Qt::Window) {
+    // Load config
+    QString default_home = Config::getBuildHome();
+    if (default_home != "_None") {
+        target_directory_selected_label.setText(default_home);
+    }
+
     // Init default
     setLocations();
     setFixedSize(window_w,window_h);
     setAdvanced(advanced);
+
+    enableCompileInput(false);
 
     setWindowTitle((window_title_base + (advanced ? "Advanced" : "Default")).c_str());
 
@@ -52,7 +61,6 @@ void BuildConfigurator::setLocations() {
     subprocess_output.setLineWrapMode(QPlainTextEdit::NoWrap);
     subprocess_output.setReadOnly(true);
     start_compile.setGeometry(30,310,180,30);
-    start_compile.setEnabled(false);
 }
 
 void BuildConfigurator::setAdvanced(bool enabled) {
@@ -98,7 +106,7 @@ void BuildConfigurator::confirmAndDownloadRepo() {
         }
     }
     // Disable Window functions
-    disableDLInput();
+    enableDLInput(false);
     // Log
     LogManager::writeToLog("### New build requested, data start ###\n");
     LogManager::writeToLog("Repository: " + active_build.repo + "\n");
@@ -121,31 +129,36 @@ void BuildConfigurator::DLFinishCallback(int exitcode) {
     this->setEnabled(true);
     if (exitcode == 0) {
         LogManager::writeToLog("Repo downloaded successfully.\n");
-        start_compile.setEnabled(true);
+        Config::setBuildHome(active_build.directory);
+        enableCompileInput(true);
     } else {
         QMessageBox::critical(this, "Download error", "Could not download repo!");
     }
 }
 
-void BuildConfigurator::disableDLInput() {
-    repo_select.setEnabled(false);
-    branch_select.setEnabled(false);
-    target_directory_button.setEnabled(false);
-    name_select.setEnabled(false);
-    download_files.setEnabled(false);
+void BuildConfigurator::enableDLInput(bool enable) {
+    repo_select.setEnabled(enable);
+    branch_select.setEnabled(enable);
+    target_directory_button.setEnabled(enable);
+    name_select.setEnabled(enable);
+    download_files.setEnabled(enable);
 }
 
 void BuildConfigurator::compileBuild() {
-    disableCompileInput();
+    enableCompileInput(false);
     std::function<void(int)> callback = std::bind(&BuildConfigurator::CompileFinishCallback, this, std::placeholders::_1);
     active_build.region = SM64_Region::US;
     PlatformRunner::runProcess(QCoreApplication::applicationDirPath() + "/presets/compile_build.sh", active_build, callback);
 }
 
-void BuildConfigurator::disableCompileInput() {
-    start_compile.setEnabled(false);
+void BuildConfigurator::enableCompileInput(bool enable) {
+    start_compile.setEnabled(enable);
 }
 
 void BuildConfigurator::CompileFinishCallback(int exitcode) {
-
+    if (exitcode == 0) {
+        QMessageBox::information(this,"Build successful!", "The build was generated without error, and can be launched from the main launcher window.\nYou can close the current window safely.");
+    } else {
+        QMessageBox::critical(this,"Build error!", "The build was aborted due to a compile error.\nRe-check the requirements, check the logs and try again.");
+    }
 }

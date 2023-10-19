@@ -51,7 +51,7 @@ class BuildConfigurator : public QMainWindow {
         void confirmAndDownloadRepo();
         void compileBuild();
         void DLFinishCallback(int);
-        void disableDLInput();
+        void enableDLInput(bool);
         void CompileFinishCallback(int);
-        void disableCompileInput();
+        void enableCompileInput(bool);
 };

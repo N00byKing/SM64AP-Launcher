@@ -52,6 +52,7 @@ void resetToDefault() {
     setMSYSPath(default_msys_path);
     setROMPath("_None",BuildConfigurator::SM64_Region::US);
     setROMPath("_None",BuildConfigurator::SM64_Region::JP);
+    setBuildHome("_None");
 }
 
 void setAdvanced(bool enable) {
@@ -98,6 +99,14 @@ QString getROMPath(BuildConfigurator::SM64_Region region) {
             return "_None";
             break;
     }
+}
+
+void setBuildHome(QString path) {
+    config["default_build_root"] = path;
+}
+
+QString getBuildHome() {
+    return config["default_build_root"].toString();
 }
 
 }

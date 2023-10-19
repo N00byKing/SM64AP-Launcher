@@ -19,7 +19,9 @@ namespace Config {
     bool isAdvanced();
     void setMSYSPath(QString);
     QString getMSYSPath();
-    bool isFirstRun();
     void setROMPath(QString,BuildConfigurator::SM64_Region);
     QString getROMPath(BuildConfigurator::SM64_Region);
+    void setBuildHome(QString);
+    QString getBuildHome();
+    bool isFirstRun();
 }
