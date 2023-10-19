@@ -48,6 +48,7 @@ void RequirementHandler::setAdvanced(bool enabled) {
 }
 
 void RequirementHandler::checkRequirements() {
+    #ifdef WIN32
     QString msys_dir = QDir{QDir::cleanPath(msys_select.text())}.absolutePath();
     if (msys_dir.contains(" ")) {
         QMessageBox::critical(this,"Invalid MSYS Path", "The given MSYS path contains spaces. This is not allowed.");
@@ -62,6 +63,7 @@ void RequirementHandler::checkRequirements() {
     }
     Config::setMSYSPath(msys_dir);
     // TODO install requirements
+    #endif
     QString us_rom_path = Config::getROMPath(BuildConfigurator::SM64_Region::US);
     QString jp_rom_path = Config::getROMPath(BuildConfigurator::SM64_Region::JP);
     // Check if ANY rom is registered
