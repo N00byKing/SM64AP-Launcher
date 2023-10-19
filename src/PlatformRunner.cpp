@@ -36,7 +36,7 @@ void runProcess(QString cmd, BuildConfigurator::SM64_Build build, std::function<
     QString msys_path = Config::getMSYSPath();
     subprocess.setProgram(msys_path + "/usr/bin/bash.exe");
     #else
-    subprocess.setProgram("/usr/bin/bash");
+    subprocess.setProgram("bash");
     #endif
     subprocess.setArguments(QStringList() << "-c" << "--" << cmd);
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
