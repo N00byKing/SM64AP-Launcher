@@ -14,6 +14,7 @@
 namespace PlatformRunner {
 
 QProcess subprocess;
+void __setup_process(QProcess& subprocess, QString cmd, BuildConfigurator::SM64_Build build);
 
 std::function<void(int)> finishCallback = nullptr;
 
@@ -31,7 +32,25 @@ void handleProcessFinished(int exitcode) {
     }
 }
 
-void runProcess(QString cmd, BuildConfigurator::SM64_Build build, std::function<void(int)> pfinishCallback) {
+void init() {
+    QObject::connect(&subprocess, &QProcess::readyReadStandardOutput, &stdout_writeToOutput);
+    QObject::connect(&subprocess, &QProcess::readyReadStandardError, &stderr_writeToOutput);
+    QObject::connect(&subprocess, &QProcess::finished, &handleProcessFinished);
+}
+
+void runProcess(QString cmd, BuildConfigurator::SM64_Build build, std::function<void (int)> callback) {
+    finishCallback = callback;
+    __setup_process(subprocess, cmd, build);
+    subprocess.start();
+}
+
+void runProcessDetached(QString cmd, BuildConfigurator::SM64_Build build) {
+    QProcess proc;
+    __setup_process(proc, cmd, build);
+    proc.startDetached();
+}
+
+void __setup_process(QProcess& subprocess, QString cmd, BuildConfigurator::SM64_Build build) {
     #ifdef WIN32
     QString msys_path = Config::getMSYSPath();
     subprocess.setProgram(msys_path + "/usr/bin/bash.exe");
@@ -55,11 +74,6 @@ void runProcess(QString cmd, BuildConfigurator::SM64_Build build, std::function<
         env.insert("BUILD_ROM", Config::getROMPath(BuildConfigurator::SM64_Region::JP));
     }
     subprocess.setProcessEnvironment(env);
-    QObject::connect(&subprocess, &QProcess::readyReadStandardOutput, &stdout_writeToOutput);
-    QObject::connect(&subprocess, &QProcess::readyReadStandardError, &stderr_writeToOutput);
-    QObject::connect(&subprocess, &QProcess::finished, &handleProcessFinished);
-    finishCallback = pfinishCallback;
-    subprocess.start();
 }
 
 }

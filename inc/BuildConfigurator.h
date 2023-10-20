@@ -5,6 +5,7 @@
 #include <QWidget>
 #include <QLabel>
 #include <QPushButton>
+#include <QComboBox>
 #include <QPlainTextEdit>
 #include <QMainWindow>
 
@@ -41,6 +42,8 @@ class BuildConfigurator : public QMainWindow {
         QPushButton download_files{"Download Files", this};
         QLabel download_files_label{"Confirm Repo and Branch\nand start downloading the files", this};
         QPlainTextEdit subprocess_output{this};
+        QComboBox region_select{this};
+        QLabel region_select_label{"Region",this};
         QPushButton start_compile{"Create Build", this};
         SM64_Build active_build;
 

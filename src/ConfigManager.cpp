@@ -137,16 +137,16 @@ void removeBuild(QWidget* parent, QString name) {
     config["builds"] = builds;
 }
 
-std::vector<BuildConfigurator::SM64_Build> getBuilds() {
-    std::vector<BuildConfigurator::SM64_Build> builds;
+std::map<QString,BuildConfigurator::SM64_Build> getBuilds() {
+    std::map<QString,BuildConfigurator::SM64_Build> builds;
     for (QString name : config["builds"].toObject().keys()) {
         BuildConfigurator::SM64_Build build;
         build.name = name;
         build.repo = config["builds"][build.name]["repo"].toString();
         build.branch = config["builds"][build.name]["branch"].toString();
         build.directory = config["builds"][build.name]["directory"].toString();
-        build.region = config["builds"][build.name]["directory"].toString() == "US" ? BuildConfigurator::SM64_Region::US : (config["builds"][build.name]["directory"].toString() == "JP" ? BuildConfigurator::SM64_Region::JP : BuildConfigurator::SM64_Region::Undef);
-        builds.push_back(build);
+        build.region = config["builds"][build.name]["region"].toString() == "US" ? BuildConfigurator::SM64_Region::US : (config["builds"][build.name]["region"].toString() == "JP" ? BuildConfigurator::SM64_Region::JP : BuildConfigurator::SM64_Region::Undef);
+        builds[build.name] = build;
     }
     return builds;
 }

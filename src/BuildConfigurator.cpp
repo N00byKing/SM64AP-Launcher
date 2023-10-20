@@ -25,6 +25,11 @@ BuildConfigurator::BuildConfigurator(QWidget* parent, bool advanced) : QMainWind
     if (default_home != "_None") {
         target_directory_selected_label.setText(default_home);
     }
+    if (Config::getROMPath(BuildConfigurator::SM64_Region::US) != "_None")
+        region_select.addItem("US");
+    if (Config::getROMPath(BuildConfigurator::SM64_Region::JP) != "_None")
+        region_select.addItem("JP");
+    
 
     // Init default
     setLocations();
@@ -61,7 +66,9 @@ void BuildConfigurator::setLocations() {
     subprocess_output.setFont(fixedFont);
     subprocess_output.setLineWrapMode(QPlainTextEdit::NoWrap);
     subprocess_output.setReadOnly(true);
-    start_compile.setGeometry(30,310,180,30);
+    region_select.setGeometry(30,300,180,30);
+    region_select_label.setGeometry(300,300,180,30);
+    start_compile.setGeometry(30,340,180,30);
 }
 
 void BuildConfigurator::setAdvanced(bool enabled) {
@@ -94,15 +101,12 @@ void BuildConfigurator::confirmAndDownloadRepo() {
     // Sanity Checks
     if (!target_dir.exists()) { QMessageBox::critical(this, "Invalid Target Directory", "The directory you selected does not exist."); return;}
     if (name_select.text().isEmpty()) { QMessageBox::critical(this, "Invalid Build Name", "You have not entered a build name"); return; }
-    std::vector<BuildConfigurator::SM64_Build> existing_builds = Config::getBuilds();
-    for (BuildConfigurator::SM64_Build build : existing_builds) {
-        if (build.name == active_build.name) {
-            QMessageBox::StandardButton answer = QMessageBox::question(this, "Existing Build Name", "An existing build already has this name. Do you want to remove its entry?");
-            if (answer == QMessageBox::StandardButton::Yes) {
-                Config::removeBuild(this, build.name);
-            }
-            return;
+    if (Config::getBuilds().count(active_build.name)) {
+        QMessageBox::StandardButton answer = QMessageBox::question(this, "Existing Build Name", "An existing build already has this name. Do you want to remove its entry?");
+        if (answer == QMessageBox::StandardButton::Yes) {
+            Config::removeBuild(this, active_build.name);
         }
+        return;
     }
     QDir build_path = active_build.directory + "/" + active_build.name;
     if (build_path.exists()) {
@@ -137,6 +141,7 @@ void BuildConfigurator::printToUser(QString str) {
 }
 
 void BuildConfigurator::DLFinishCallback(int exitcode) {
+    LogManager::flush();
     this->setEnabled(true);
     if (exitcode == 0) {
         LogManager::writeToLog("Repo downloaded successfully.\n");
@@ -158,15 +163,17 @@ void BuildConfigurator::enableDLInput(bool enable) {
 void BuildConfigurator::compileBuild() {
     enableCompileInput(false);
     std::function<void(int)> callback = std::bind(&BuildConfigurator::CompileFinishCallback, this, std::placeholders::_1);
-    active_build.region = SM64_Region::US;
+    active_build.region = region_select.currentText() == "US" ? BuildConfigurator::SM64_Region::US : (region_select.currentText() == "JP" ? BuildConfigurator::SM64_Region::JP : BuildConfigurator::SM64_Region::Undef);
     PlatformRunner::runProcess(QCoreApplication::applicationDirPath() + "/presets/compile_build.sh", active_build, callback);
 }
 
 void BuildConfigurator::enableCompileInput(bool enable) {
     start_compile.setEnabled(enable);
+    region_select.setEnabled(enable);
 }
 
 void BuildConfigurator::CompileFinishCallback(int exitcode) {
+    LogManager::flush();
     if (exitcode == 0) {
         Config::registerBuild(active_build);
         QMessageBox::information(this,"Build successful!", "The build was generated without error, and can be launched from the main launcher window.");

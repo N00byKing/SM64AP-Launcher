@@ -5,10 +5,15 @@
 #include <QCheckBox>
 #include <QShowEvent>
 #include <QWidget>
+#include <QListWidget>
+#include <QMessageBox>
+#include <QObject>
 #include <memory>
+#include <map>
 
 #include "ConfigManager.h"
 #include "BuildConfigurator.h"
+#include "PlatformRunner.h"
 #include "RequirementHandler.h"
 
 MainWindow::MainWindow() {
@@ -21,16 +26,29 @@ MainWindow::MainWindow() {
     setAdvanced(use_advanced.isChecked());
     setFixedSize(window_w,window_h);
 
+    build_list.setSelectionMode(QListWidget::SingleSelection);
+    selected_build_info.setReadOnly(true);
+    play_build.setEnabled(false);
+
     setWindowTitle("SM64APLauncher - Main Window");
 
     // Connect things
     QObject::connect(&use_advanced, &QCheckBox::toggled, this, &MainWindow::setAdvanced);
+    QObject::connect(&play_build, &QPushButton::released, this, &MainWindow::startGame);
     QObject::connect(&create_default_build, &QPushButton::released, this, &MainWindow::spawnDefaultConfigurator);
     QObject::connect(&create_custom_build, &QPushButton::released, this, &MainWindow::spawnAdvancedConfigurator);
     QObject::connect(&recheck_requirements, &QPushButton::released, this, &MainWindow::spawnRequirementHandler);
+    QObject::connect(&build_list, &QListWidget::currentItemChanged, this, &MainWindow::buildSelectionHandler);
 }
 
 void MainWindow::setLocations() {
+    build_list_label.setGeometry(30,10,200,30);
+    launch_options_label.setGeometry(240,10,200,30);
+    launch_options.setGeometry(240,40,250,100);
+    build_list.setGeometry(30,40,200,100);
+    build_info_label.setGeometry(30,140,150,30);
+    selected_build_info.setGeometry(30,170,460,100);
+    play_build.setGeometry(550,40,200,30);
     create_default_build.setGeometry(550,100,200,30);
     create_custom_build.setGeometry(550,140,200,30);
     recheck_requirements.setGeometry(550,180,200,30);
@@ -40,6 +58,16 @@ void MainWindow::setLocations() {
 void MainWindow::setAdvanced(bool enable) {
     create_custom_build.setVisible(enable);
     Config::setAdvanced(enable);
+}
+
+void MainWindow::parseBuilds() {
+    build_list.clear();
+    std::map<QString,BuildConfigurator::SM64_Build> builds = Config::getBuilds();
+    for (std::pair<QString,BuildConfigurator::SM64_Build> build : builds) {
+        build_list.addItem(build.first);
+    }
+    if (build_list.count() == 0)
+        build_list.addItem("No builds!\nCreate a new one.");
 }
 
 void MainWindow::spawnDefaultConfigurator() {
@@ -75,4 +103,26 @@ void MainWindow::showEvent(QShowEvent *event) {
     } else {
         event->accept();
     }
+    parseBuilds();
+}
+
+void MainWindow::buildSelectionHandler(QListWidgetItem *current, QListWidgetItem *previous) {
+    QString selected_build_name = current->text();
+    if (selected_build_name.contains("No builds")) return;
+    selected_build = Config::getBuilds()[selected_build_name];
+    QString build_info_string =
+                 "Repo: " + selected_build.repo
+        + "\n" + "Branch: " + selected_build.branch
+        + "\n" + "Region: " + (selected_build.region == BuildConfigurator::SM64_Region::US ? "US" : (selected_build.region == BuildConfigurator::SM64_Region::JP ? "JP" : "!UNKNOWN!"))
+        + "\n" + "Directory: " + selected_build.directory;
+    play_build.setEnabled(true);
+    selected_build_info.setPlainText(build_info_string);
+}
+
+void MainWindow::startGame() {
+    if (selected_build.name == "_None") {
+        QMessageBox::information(this, "No build selected", "You need to select a build from the left first.\nIf there are none, create one with the buttons below.");
+        return;
+    }
+    PlatformRunner::runProcessDetached(QCoreApplication::applicationDirPath() + "/presets/run_game.sh '" + launch_options.toPlainText() + "'", selected_build);
 }

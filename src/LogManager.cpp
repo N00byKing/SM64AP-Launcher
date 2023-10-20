@@ -18,7 +18,7 @@ void initLogs() {
             QMessageBox::critical(nullptr, "Could not open Log", "The log file is inaccessible. This may indicate further issues.");
     }
     logs.write("SM64APLauncher, commit " GIT_REV "\n");
-    logs.flush();
+    flush();
 }
 
 void forkLogTo(BuildConfigurator* textedit) { forklog = textedit; }
@@ -29,6 +29,10 @@ void writeToLog(QString line) {
     if (forklog) {
         forklog->printToUser(line);
     }
+}
+
+void flush() {
+    logs.flush();
 }
 
 }

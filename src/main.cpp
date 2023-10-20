@@ -3,6 +3,7 @@
 #include "LogManager.h"
 #include "ConfigManager.h"
 #include "MainWindow.h"
+#include "PlatformRunner.h"
 
 int main(int argc, char **argv) {
     QApplication app(argc, argv);
@@ -12,6 +13,7 @@ int main(int argc, char **argv) {
         app.exit(1);
         return 1;
     }
+    PlatformRunner::init();
 
     MainWindow main_win;
     main_win.show();

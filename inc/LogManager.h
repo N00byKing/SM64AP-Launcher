@@ -9,4 +9,5 @@ namespace LogManager {
     void writeToLog(QString line);
     void forkLogTo(BuildConfigurator* bconfig);
     void unlinkFork();
+    void flush();
 }

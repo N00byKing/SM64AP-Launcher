@@ -16,7 +16,7 @@ namespace Config {
     void resetToDefault();
     void registerBuild(BuildConfigurator::SM64_Build);
     void removeBuild(QWidget*,QString);
-    std::vector<BuildConfigurator::SM64_Build> getBuilds();
+    std::map<QString, BuildConfigurator::SM64_Build> getBuilds();
     void setAdvanced(bool);
     bool isAdvanced();
     void setMSYSPath(QString);
