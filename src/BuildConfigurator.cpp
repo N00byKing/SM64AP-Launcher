@@ -170,6 +170,7 @@ void BuildConfigurator::CompileFinishCallback(int exitcode) {
     LogManager::flush();
     if (exitcode == 0) {
         Config::registerBuild(active_build);
+        Config::writeConfig();
         QMessageBox::information(this,"Build successful!", "The build was generated without error, and can be launched from the main launcher window.");
         this->close();
     } else {
