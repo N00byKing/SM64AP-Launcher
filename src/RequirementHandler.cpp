@@ -14,7 +14,9 @@
 
 RequirementHandler::RequirementHandler(QWidget* parent, bool advanced) : QWidget(parent, Qt::Window) {
     // Load config
+    #ifdef WIN32
     msys_select.setText(Config::getMSYSPath());
+    #endif
 
     // Init default
     setLocations();
@@ -30,21 +32,24 @@ RequirementHandler::RequirementHandler(QWidget* parent, bool advanced) : QWidget
 }
 
 void RequirementHandler::setLocations() {
+    #ifdef WIN32
     msys_select.setGeometry(30,30,250,30);
     msys_select_label.setGeometry(300,30,180,30);
+    reinstall_msys.setGeometry(30,230,250,30);
+    reinstall_dependencies.setGeometry(30,270,250,30);
+    #endif
     select_rom.setGeometry(30,70,250,30);
     check_requirements.setGeometry(30,110,250,30);
     troubleshooting_label.setGeometry(30,150,180,30);
     rewrite_config.setGeometry(30,190,250,30);
-    reinstall_msys.setGeometry(30,230,250,30);
-    reinstall_dependencies.setGeometry(30,270,250,30);
 }
 
 void RequirementHandler::setAdvanced(bool enabled) {
+    #ifdef WIN32
     msys_select.setEnabled(enabled);
-    troubleshooting_label.setEnabled(enabled);
     reinstall_msys.setEnabled(enabled);
     reinstall_dependencies.setEnabled(enabled);
+    #endif
 }
 
 void RequirementHandler::checkRequirements() {

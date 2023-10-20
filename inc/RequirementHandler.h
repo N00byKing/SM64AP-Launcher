@@ -16,13 +16,15 @@ class RequirementHandler : public QWidget {
         RequirementHandler() = delete;
     private:
         using QWidget::QWidget;
+        #ifdef WIN32
         QLineEdit msys_select{Config::default_msys_path,this};
         QLabel msys_select_label{"Path to MSYS installation",this};
+        QPushButton reinstall_msys{"Re-install MSYS",this};
+        QPushButton reinstall_dependencies{"Re-install Dependencies",this};
+        #endif
         QPushButton check_requirements{"Check requirements",this};
         QLabel troubleshooting_label{"Troubleshooting",this};
         QPushButton rewrite_config{"Re-write config",this};
-        QPushButton reinstall_msys{"Re-install MSYS",this};
-        QPushButton reinstall_dependencies{"Re-install Dependencies",this};
         QPushButton select_rom{"Register SM64 Rom",this};
         void closeEvent(QCloseEvent *event);
         void checkRequirements();
