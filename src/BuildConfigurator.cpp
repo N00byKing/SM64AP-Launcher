@@ -10,6 +10,7 @@
 #include <QFontDatabase>
 #include <functional>
 #include <string>
+#include <vector>
 
 #include "ConfigManager.h"
 #include "MainWindow.h"
@@ -93,6 +94,16 @@ void BuildConfigurator::confirmAndDownloadRepo() {
     // Sanity Checks
     if (!target_dir.exists()) { QMessageBox::critical(this, "Invalid Target Directory", "The directory you selected does not exist."); return;}
     if (name_select.text().isEmpty()) { QMessageBox::critical(this, "Invalid Build Name", "You have not entered a build name"); return; }
+    std::vector<BuildConfigurator::SM64_Build> existing_builds = Config::getBuilds();
+    for (BuildConfigurator::SM64_Build build : existing_builds) {
+        if (build.name == active_build.name) {
+            QMessageBox::StandardButton answer = QMessageBox::question(this, "Existing Build Name", "An existing build already has this name. Do you want to remove its entry?");
+            if (answer == QMessageBox::StandardButton::Yes) {
+                Config::removeBuild(this, build.name);
+            }
+            return;
+        }
+    }
     QDir build_path = active_build.directory + "/" + active_build.name;
     if (build_path.exists()) {
         QMessageBox::StandardButton answer = QMessageBox::question(this, "Folder exists", "There already is a folder called '" + active_build.name + "' in the target directory.\nDo you want to remove it and continue?");
@@ -157,8 +168,11 @@ void BuildConfigurator::enableCompileInput(bool enable) {
 
 void BuildConfigurator::CompileFinishCallback(int exitcode) {
     if (exitcode == 0) {
-        QMessageBox::information(this,"Build successful!", "The build was generated without error, and can be launched from the main launcher window.\nYou can close the current window safely.");
+        Config::registerBuild(active_build);
+        QMessageBox::information(this,"Build successful!", "The build was generated without error, and can be launched from the main launcher window.");
+        this->close();
     } else {
         QMessageBox::critical(this,"Build error!", "The build was aborted due to a compile error.\nRe-check the requirements, check the logs and try again.");
+        enableDLInput(true);
     }
 }

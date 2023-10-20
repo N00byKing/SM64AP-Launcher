@@ -1,9 +1,11 @@
 #include "ConfigManager.h"
 
 #include <QFile>
+#include <QDir>
 #include <QMessageBox>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <vector>
 
 #include "version.h"
 #include "BuildConfigurator.h"
@@ -53,6 +55,7 @@ void resetToDefault() {
     setROMPath("_None",BuildConfigurator::SM64_Region::US);
     setROMPath("_None",BuildConfigurator::SM64_Region::JP);
     setBuildHome("_None");
+    config["builds"] = QJsonObject();
 }
 
 void setAdvanced(bool enable) {
@@ -107,6 +110,45 @@ void setBuildHome(QString path) {
 
 QString getBuildHome() {
     return config["default_build_root"].toString();
+}
+
+void registerBuild(BuildConfigurator::SM64_Build build) {
+    QJsonObject builds = config["builds"].toObject();
+    QJsonObject build_o;
+    build_o["repo"] = build.repo;
+    build_o["branch"] = build.branch;
+    build_o["region"] = (build.region == BuildConfigurator::SM64_Region::US ? "US" : (build.region == BuildConfigurator::SM64_Region::JP ? "JP" : "!UNKNOWN!"));
+    build_o["directory"] = build.directory;
+    builds[build.name] = build_o;
+    config["builds"] = builds;
+}
+
+void removeBuild(QWidget* parent, QString name) {
+    QMessageBox::StandardButton answer = QMessageBox::question(parent, "Delete Build", "Do you want to DELETE (not just remove the config entry!) this build?");
+    if (answer == QMessageBox::StandardButton::Yes) {
+        QDir build = config["builds"][name]["directory"].toString() + "/" + name;
+        if (!build.removeRecursively()) {
+            QMessageBox::critical(parent,"Deletion failed", "Could not delete build folder! Is the game still running?");
+            return;
+        }
+    }
+    QJsonObject builds = config["builds"].toObject();
+    builds.remove(name);
+    config["builds"] = builds;
+}
+
+std::vector<BuildConfigurator::SM64_Build> getBuilds() {
+    std::vector<BuildConfigurator::SM64_Build> builds;
+    for (QString name : config["builds"].toObject().keys()) {
+        BuildConfigurator::SM64_Build build;
+        build.name = name;
+        build.repo = config["builds"][build.name]["repo"].toString();
+        build.branch = config["builds"][build.name]["branch"].toString();
+        build.directory = config["builds"][build.name]["directory"].toString();
+        build.region = config["builds"][build.name]["directory"].toString() == "US" ? BuildConfigurator::SM64_Region::US : (config["builds"][build.name]["directory"].toString() == "JP" ? BuildConfigurator::SM64_Region::JP : BuildConfigurator::SM64_Region::Undef);
+        builds.push_back(build);
+    }
+    return builds;
 }
 
 }
