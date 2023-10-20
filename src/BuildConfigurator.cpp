@@ -46,7 +46,7 @@ BuildConfigurator::BuildConfigurator(QWidget* parent, bool advanced) : QMainWind
     QObject::connect(&start_compile, &QPushButton::released, this, &BuildConfigurator::compileBuild);
 
     // Link logs to output
-    LogManager::forkLogTo(this);
+    LogManager::forkLogTo(&this->subprocess_output);
 };
 
 void BuildConfigurator::setLocations() {
@@ -132,12 +132,6 @@ void BuildConfigurator::confirmAndDownloadRepo() {
     // START DOWNLOAD
     std::function<void(int)> callback = std::bind(&BuildConfigurator::DLFinishCallback, this, std::placeholders::_1);
     PlatformRunner::runProcess(QCoreApplication::applicationDirPath() + "/presets/repo_dl.sh", active_build, callback);
-}
-
-void BuildConfigurator::printToUser(QString str) {
-    subprocess_output.moveCursor (QTextCursor::End);
-    subprocess_output.insertPlainText (str);
-    subprocess_output.moveCursor (QTextCursor::End);
 }
 
 void BuildConfigurator::DLFinishCallback(int exitcode) {

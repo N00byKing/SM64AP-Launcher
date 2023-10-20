@@ -5,13 +5,14 @@
 #include <QString>
 
 #include "BuildConfigurator.h"
+#include "OutputWidget.h"
 #include "version.h"
 
 namespace LogManager {
 
 bool is_init = false;
 QFile logs{"logs.txt", nullptr};
-BuildConfigurator* forklog = nullptr;
+OutputWidget* forklog = nullptr;
 
 void initLogs() {
     if (!logs.open(QIODeviceBase::Truncate | QIODeviceBase::ReadWrite)) {
@@ -21,7 +22,7 @@ void initLogs() {
     flush();
 }
 
-void forkLogTo(BuildConfigurator* textedit) { forklog = textedit; }
+void forkLogTo(OutputWidget* textedit) { forklog = textedit; }
 void unlinkFork() { forklog = nullptr; }
 
 void writeToLog(QString line) {

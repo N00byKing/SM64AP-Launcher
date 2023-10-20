@@ -17,6 +17,7 @@ qt_add_executable(SM64APLauncher
     src/RequirementHandler.cpp
     src/ConfigManager.cpp
     src/PlatformRunner.cpp
+    src/OutputWidget.cpp
 )
 
 # Linking

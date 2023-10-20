@@ -1,5 +1,6 @@
 #pragma once
 
+#include "OutputWidget.h"
 #include <QWidget>
 #include <QLineEdit>
 #include <QWidget>
@@ -41,7 +42,7 @@ class BuildConfigurator : public QMainWindow {
         QLabel name_select_label{"Name for this build", this};
         QPushButton download_files{"Download Files", this};
         QLabel download_files_label{"Confirm Repo and Branch\nand start downloading the files", this};
-        QPlainTextEdit subprocess_output{this};
+        OutputWidget subprocess_output{this};
         QComboBox region_select{this};
         QLabel region_select_label{"Region",this};
         QPushButton start_compile{"Create Build", this};

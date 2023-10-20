@@ -2,12 +2,12 @@
 
 #include <QString>
 
-#include "BuildConfigurator.h"
+#include "OutputWidget.h"
 
 namespace LogManager {
     void initLogs();
     void writeToLog(QString line);
-    void forkLogTo(BuildConfigurator* bconfig);
+    void forkLogTo(OutputWidget*);
     void unlinkFork();
     void flush();
 }
