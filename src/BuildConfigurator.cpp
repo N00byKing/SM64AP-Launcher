@@ -40,6 +40,11 @@ BuildConfigurator::BuildConfigurator(QWidget* parent, bool advanced) : QMainWind
 
     setWindowTitle((window_title_base + (advanced ? "Advanced" : "Default")).c_str());
 
+    const QFont fixedFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+    subprocess_output.setFont(fixedFont);
+    subprocess_output.setLineWrapMode(QPlainTextEdit::NoWrap);
+    subprocess_output.setReadOnly(true);
+
     // Connect things
     QObject::connect(&target_directory_button, &QPushButton::released, this, &BuildConfigurator::selectTargetDirectory);
     QObject::connect(&download_files, &QPushButton::released, this, &BuildConfigurator::confirmAndDownloadRepo);
@@ -62,10 +67,6 @@ void BuildConfigurator::setLocations() {
     download_files.setGeometry(30,230,180,30);
     download_files_label.setGeometry(300,230,180,30);
     subprocess_output.setGeometry(500,30,570,400);
-    const QFont fixedFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
-    subprocess_output.setFont(fixedFont);
-    subprocess_output.setLineWrapMode(QPlainTextEdit::NoWrap);
-    subprocess_output.setReadOnly(true);
     region_select.setGeometry(30,300,180,30);
     region_select_label.setGeometry(300,300,180,30);
     start_compile.setGeometry(30,340,180,30);

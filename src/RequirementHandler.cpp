@@ -11,8 +11,9 @@
 #include "ConfigManager.h"
 #include "LogManager.h"
 #include "BuildConfigurator.h"
+#include "PlatformRunner.h"
 
-RequirementHandler::RequirementHandler(QWidget* parent, bool advanced) : QWidget(parent, Qt::Window) {
+RequirementHandler::RequirementHandler(QWidget* parent, bool padvanced) : QWidget(parent, Qt::Window) {
     // Load config
     #ifdef WIN32
     msys_select.setText(Config::getMSYSPath());
@@ -21,14 +22,23 @@ RequirementHandler::RequirementHandler(QWidget* parent, bool advanced) : QWidget
     // Init default
     setLocations();
     setFixedSize(window_w,window_h);
+    advanced = padvanced;
     setAdvanced(advanced);
 
     setWindowTitle("SM64APLauncher - Requirements and Debugging");
+
+    const QFont fixedFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+    log_output.setFont(fixedFont);
+    log_output.setLineWrapMode(QPlainTextEdit::NoWrap);
+    log_output.setReadOnly(true);
 
     // Connect things
     QObject::connect(&check_requirements, &QPushButton::released, this, &RequirementHandler::checkRequirements);
     QObject::connect(&select_rom, &QPushButton::released, this, &RequirementHandler::registerROM);
     QObject::connect(&rewrite_config, &QPushButton::released, this, &Config::writeConfig);
+    QObject::connect(&reinstall_msys, &QPushButton::released, this, &RequirementHandler::reinstallMSYS);
+    QObject::connect(&reinstall_dependencies, &QPushButton::released, this, &RequirementHandler::reinstallDependencies);
+    LogManager::forkLogTo(&this->log_output);
 }
 
 void RequirementHandler::setLocations() {
@@ -42,6 +52,7 @@ void RequirementHandler::setLocations() {
     check_requirements.setGeometry(30,110,250,30);
     troubleshooting_label.setGeometry(30,150,180,30);
     rewrite_config.setGeometry(30,190,250,30);
+    log_output.setGeometry(30,310,410,200);
 }
 
 void RequirementHandler::setAdvanced(bool enabled) {
@@ -56,13 +67,14 @@ void RequirementHandler::checkRequirements() {
     #ifdef WIN32
     QString msys_dir = QDir{QDir::cleanPath(msys_select.text())}.absolutePath();
     if (msys_dir.contains(" ")) {
+        LogManager::writeToLog("Invalid MSYS Path: '" + msys_dir + "'\n");
         QMessageBox::critical(this,"Invalid MSYS Path", "The given MSYS path contains spaces. This is not allowed.");
         return;
     }
     if (!QFile::exists(msys_dir + "/usr/bin/bash.exe")) {
         QMessageBox::StandardButton answer = QMessageBox::question(this, "MSYS not installed or corrupted", "MSYS was not found at the specified location. Attempt reinstall? This will install MSYS at the default location.");
         if (answer == QMessageBox::StandardButton::Yes) {
-            // TODO automatic downloading of MSYS
+            reinstallMSYS();
         }
         return;
     }
@@ -140,4 +152,59 @@ BuildConfigurator::SM64_Region RequirementHandler::identifyROM(QString rom_file_
 void RequirementHandler::closeEvent(QCloseEvent *event) {
     parentWidget()->setEnabled(true);
     // No need to delete now. MainWindow will, either on close or on regen
+}
+
+void RequirementHandler::reinstallMSYS() {
+    QMessageBox::critical(this, "TODO", "Currently not implemented, do it yourself :)");
+    return;
+    LogManager::writeToLog("Reinstalling MSYS...");
+}
+
+void RequirementHandler::reinstallDependencies() {
+    enableInput(false);
+    LogManager::writeToLog("Reinstalling Dependencies...\n");
+    // First, update MSYS
+    BuildConfigurator::SM64_Build tmp_build;
+    std::function<void(int)> callback = std::bind(&RequirementHandler::updateMSYSCallback, this, std::placeholders::_1);
+    PlatformRunner::runProcess("pacman -Syyuu --noconfirm", tmp_build, callback);
+    // Then, install dependencies
+}
+
+void RequirementHandler::updateMSYSCallback(int exitcode) {
+    enableInput(true);
+    if (exitcode == 0) {
+        BuildConfigurator::SM64_Build tmp_build;
+        std::function<void(int)> callback = std::bind(&RequirementHandler::installDependencyCallback, this, std::placeholders::_1);
+        QString dependency_install_cmd = "pacman -S --noconfirm";
+        for (QString dependency : dependencies) {
+            dependency_install_cmd += " " + dependency;
+        }
+        enableInput(false);
+        PlatformRunner::runProcess(dependency_install_cmd, tmp_build, callback);
+    } else {
+        QMessageBox::critical(this, "Error updating MSYS", "Could not update MSYS! Check the log output for details");
+    }
+}
+
+void RequirementHandler::installDependencyCallback(int exitcode) {
+    enableInput(true);
+    if (exitcode == 0) {
+        LogManager::writeToLog("Dependencies installed.\n");
+        QMessageBox::information(this, "MSYS Dependencies installed", "MSYS was updated and all dependencies were installed successfully.");
+    } else {
+        QMessageBox::critical(this, "MSYS Dependency install error", "There was an error installing the MSYS dependencies, check log for details.");
+    }
+}
+
+void RequirementHandler::enableInput(bool enable) {
+    setAdvanced(advanced && enable);
+    select_rom.setEnabled(enable);
+    check_requirements.setEnabled(enable);
+    rewrite_config.setEnabled(enable);
+}
+
+void RequirementHandler::printToUser(QString str) {
+    log_output.moveCursor (QTextCursor::End);
+    log_output.insertPlainText (str);
+    log_output.moveCursor (QTextCursor::End);
 }

@@ -5,13 +5,16 @@
 #include <QLabel>
 #include <QPushButton>
 
+#include <vector>
+
 #include "ConfigManager.h"
 #include "BuildConfigurator.h"
+#include "OutputWidget.h"
 
 class RequirementHandler : public QWidget {
     public:
         static constexpr int window_w = 480;
-        static constexpr int window_h = 500;
+        static constexpr int window_h = 550;
         RequirementHandler(QWidget* parent, bool advanced);
         RequirementHandler() = delete;
     private:
@@ -26,10 +29,28 @@ class RequirementHandler : public QWidget {
         QLabel troubleshooting_label{"Troubleshooting",this};
         QPushButton rewrite_config{"Re-write config",this};
         QPushButton select_rom{"Register SM64 Rom",this};
+        OutputWidget log_output{this};
+        bool advanced = false;
+        std::vector<QString> dependencies = {
+            "unzip",
+            "mingw-w64-x86_64-gcc",
+            "mingw-w64-x86_64-glew",
+            "mingw-w64-x86_64-SDL2",
+            "git",
+            "make",
+            "python3",
+            "mingw-w64-x86_64-cmake"
+        };
         void closeEvent(QCloseEvent *event);
         void checkRequirements();
         void registerROM();
         void setLocations();
         void setAdvanced(bool);
         BuildConfigurator::SM64_Region identifyROM(QString);
+        void reinstallMSYS();
+        void reinstallDependencies();
+        void updateMSYSCallback(int);
+        void installDependencyCallback(int);
+        void enableInput(bool);
+        void printToUser(QString);
 };
