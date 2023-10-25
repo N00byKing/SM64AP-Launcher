@@ -163,7 +163,7 @@ void RequirementHandler::reinstallDependencies() {
     LogManager::writeToLog("Reinstalling Dependencies...\n");
     // First, update MSYS
     std::function<void(int)> callback = std::bind(&RequirementHandler::updateMSYSCallback, this, std::placeholders::_1);
-    PlatformRunner::runProcess("pacman -Syyuu --noconfirm", callback);
+    PlatformRunner::runProcess("pacman -Syu --noconfirm", callback);
     // Then, install dependencies
 }
 
