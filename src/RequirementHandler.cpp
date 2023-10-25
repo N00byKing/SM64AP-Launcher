@@ -120,15 +120,16 @@ void RequirementHandler::registerROM() {
         case BuildConfigurator::SM64_Region::US:
             Config::setROMPath(rom_file_path, BuildConfigurator::SM64_Region::US);
             QMessageBox::information(this, "Registered US ROM", "ROM was recognized and registered as US SM64 ROM.");
-            return;
+            break;
         case BuildConfigurator::SM64_Region::JP:
             Config::setROMPath(rom_file_path, BuildConfigurator::SM64_Region::JP);
             QMessageBox::information(this, "Registered JP ROM", "ROM was recognized and registered as JP SM64 ROM.");
-            return;
+            break;
         default:
             QMessageBox::critical(this, "ROM Invalid", "ROM file is of wrong format or corrupted.");
             return;
     }
+    Config::writeConfig();
 }
 
 BuildConfigurator::SM64_Region RequirementHandler::identifyROM(QString rom_file_path) {
