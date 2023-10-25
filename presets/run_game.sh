@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 # This script is called when a build is selected to play
 # Can be edited to include 'permanent' launch options
 

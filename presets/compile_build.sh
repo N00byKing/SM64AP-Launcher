@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 # This script is called when compiling the game, after downloading
 # If you don't know what that means, don't edit it!
 

@@ -104,6 +104,8 @@ void RequirementHandler::checkRequirements() {
     CHECK_REG_ROMS(us, US)
     CHECK_REG_ROMS(jp, JP)
 
+    // All checks passed
+    QMessageBox::information(this, "No issues found", "There seem to be no issues with your installation.");
 }
 
 void RequirementHandler::registerROM() {
