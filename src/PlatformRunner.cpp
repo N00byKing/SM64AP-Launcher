@@ -62,6 +62,10 @@ void runProcess(QString cmd, std::function<void(int)> callback) {
 
 QProcessEnvironment __setup_env(BuildConfigurator::SM64_Build* build) {
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    #ifdef WIN32
+    env.remove("PYTHONPATH");
+    env.remove("PYTHONHOME");
+    #endif
     if (build == nullptr) return env;
     env.insert("MSYSTEM", "MINGW64");
     env.insert("CHERE_INVOKING", "yes");
