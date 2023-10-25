@@ -3,7 +3,12 @@
 #include <QPlainTextEdit>
 #include <qplaintextedit.h>
 
-OutputWidget::OutputWidget(QWidget* parent) : QPlainTextEdit(parent) {}
+OutputWidget::OutputWidget(QWidget* parent) : QPlainTextEdit(parent) {
+    const QFont fixedFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+    setFont(fixedFont);
+    setLineWrapMode(QPlainTextEdit::NoWrap);
+    setReadOnly(true);
+}
 
 void OutputWidget::printToUser(QString str) {
     this->moveCursor(QTextCursor::End);

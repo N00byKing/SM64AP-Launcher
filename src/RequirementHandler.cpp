@@ -27,11 +27,6 @@ RequirementHandler::RequirementHandler(QWidget* parent, bool padvanced) : QWidge
 
     setWindowTitle("SM64APLauncher - Requirements and Debugging");
 
-    const QFont fixedFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
-    log_output.setFont(fixedFont);
-    log_output.setLineWrapMode(QPlainTextEdit::NoWrap);
-    log_output.setReadOnly(true);
-
     // Connect things
     QObject::connect(&check_requirements, &QPushButton::released, this, &RequirementHandler::checkRequirements);
     QObject::connect(&select_rom, &QPushButton::released, this, &RequirementHandler::registerROM);

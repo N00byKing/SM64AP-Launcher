@@ -42,11 +42,6 @@ BuildConfigurator::BuildConfigurator(QWidget* parent, bool padvanced) : QMainWin
 
     setWindowTitle((window_title_base + (advanced ? "Advanced" : "Default")).c_str());
 
-    const QFont fixedFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
-    subprocess_output.setFont(fixedFont);
-    subprocess_output.setLineWrapMode(QPlainTextEdit::NoWrap);
-    subprocess_output.setReadOnly(true);
-
     // Connect things
     QObject::connect(&target_directory_button, &QPushButton::released, this, &BuildConfigurator::selectTargetDirectory);
     QObject::connect(&download_files, &QPushButton::released, this, &BuildConfigurator::confirmAndDownloadRepo);
