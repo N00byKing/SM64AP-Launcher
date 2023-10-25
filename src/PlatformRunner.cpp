@@ -88,7 +88,7 @@ void __setup_process(QProcess& subprocess, QString cmd, QProcessEnvironment cons
     #else
     subprocess.setProgram("bash");
     #endif
-    subprocess.setArguments(QStringList() << "-c" << "--" << cmd);
+    subprocess.setArguments(QStringList() << "--login" << "-c" << "--" << cmd);
     subprocess.setProcessEnvironment(env);
 }
 
