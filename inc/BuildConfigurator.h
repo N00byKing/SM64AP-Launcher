@@ -26,6 +26,7 @@ class BuildConfigurator : public QMainWindow {
         };
         struct SM64_Build : SM64_Build_Proto {
             SM64_Region region;
+            QString make_flags;
         };
         void printToUser(QString str);
     private:
@@ -45,9 +46,11 @@ class BuildConfigurator : public QMainWindow {
         OutputWidget subprocess_output{this};
         QComboBox region_select{this};
         QLabel region_select_label{"Region",this};
+        QLineEdit make_flags{"-j8",this};
+        QLabel make_flags_label{"Make Flags",this};
         QPushButton start_compile{"Create Build", this};
         SM64_Build active_build;
-
+        bool advanced = false;
         void setLocations();
         void setAdvanced(bool);
         void closeEvent(QCloseEvent*);

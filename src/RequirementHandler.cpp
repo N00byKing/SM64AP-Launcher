@@ -166,23 +166,21 @@ void RequirementHandler::reinstallDependencies() {
     enableInput(false);
     LogManager::writeToLog("Reinstalling Dependencies...\n");
     // First, update MSYS
-    BuildConfigurator::SM64_Build tmp_build;
     std::function<void(int)> callback = std::bind(&RequirementHandler::updateMSYSCallback, this, std::placeholders::_1);
-    PlatformRunner::runProcess("pacman -Syyuu --noconfirm", tmp_build, callback);
+    PlatformRunner::runProcess("pacman -Syyuu --noconfirm", callback);
     // Then, install dependencies
 }
 
 void RequirementHandler::updateMSYSCallback(int exitcode) {
     enableInput(true);
     if (exitcode == 0) {
-        BuildConfigurator::SM64_Build tmp_build;
         std::function<void(int)> callback = std::bind(&RequirementHandler::installDependencyCallback, this, std::placeholders::_1);
         QString dependency_install_cmd = "pacman -S --noconfirm";
         for (QString dependency : dependencies) {
             dependency_install_cmd += " " + dependency;
         }
         enableInput(false);
-        PlatformRunner::runProcess(dependency_install_cmd, tmp_build, callback);
+        PlatformRunner::runProcess(dependency_install_cmd, callback);
     } else {
         QMessageBox::critical(this, "Error updating MSYS", "Could not update MSYS! Check the log output for details");
     }

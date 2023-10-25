@@ -19,7 +19,7 @@
 
 std::string window_title_base = "Build Configurator - ";
 
-BuildConfigurator::BuildConfigurator(QWidget* parent, bool advanced) : QMainWindow(parent, Qt::Window) {
+BuildConfigurator::BuildConfigurator(QWidget* parent, bool padvanced) : QMainWindow(parent, Qt::Window) {
     // Load config
     QString default_home = Config::getBuildHome();
     if (default_home != "_None") {
@@ -32,6 +32,8 @@ BuildConfigurator::BuildConfigurator(QWidget* parent, bool advanced) : QMainWind
     
 
     // Init default
+    advanced = padvanced;
+
     setLocations();
     setFixedSize(window_w,window_h);
     setAdvanced(advanced);
@@ -69,12 +71,15 @@ void BuildConfigurator::setLocations() {
     subprocess_output.setGeometry(500,30,570,400);
     region_select.setGeometry(30,300,180,30);
     region_select_label.setGeometry(300,300,180,30);
-    start_compile.setGeometry(30,340,180,30);
+    make_flags.setGeometry(30,340,180,30);
+    make_flags_label.setGeometry(300,340,180,30);
+    start_compile.setGeometry(30,380,180,30);
 }
 
 void BuildConfigurator::setAdvanced(bool enabled) {
     repo_select.setEnabled(enabled);
     branch_select.setEnabled(enabled);
+    make_flags.setEnabled(enabled);
 }
 
 void BuildConfigurator::closeEvent(QCloseEvent *event) {
@@ -159,12 +164,14 @@ void BuildConfigurator::compileBuild() {
     enableCompileInput(false);
     std::function<void(int)> callback = std::bind(&BuildConfigurator::CompileFinishCallback, this, std::placeholders::_1);
     active_build.region = region_select.currentText() == "US" ? BuildConfigurator::SM64_Region::US : (region_select.currentText() == "JP" ? BuildConfigurator::SM64_Region::JP : BuildConfigurator::SM64_Region::Undef);
+    active_build.make_flags = make_flags.text();
     PlatformRunner::runProcess(QCoreApplication::applicationDirPath() + "/presets/compile_build.sh", active_build, callback);
 }
 
 void BuildConfigurator::enableCompileInput(bool enable) {
     start_compile.setEnabled(enable);
     region_select.setEnabled(enable);
+    make_flags.setEnabled(enable && advanced);
 }
 
 void BuildConfigurator::CompileFinishCallback(int exitcode) {
