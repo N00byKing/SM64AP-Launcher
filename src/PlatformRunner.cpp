@@ -89,10 +89,11 @@ void __setup_process(QProcess& subprocess, QString cmd, QProcessEnvironment cons
     #ifdef WIN32
     QString msys_path = Config::getMSYSPath();
     subprocess.setProgram(msys_path + "/usr/bin/bash.exe");
+    subprocess.setArguments(QStringList() << "--login" << "-c" << "--" << cmd);
     #else
     subprocess.setProgram("bash");
+    subprocess.setArguments(QStringList() << "-c" << "--" << cmd);
     #endif
-    subprocess.setArguments(QStringList() << "--login" << "-c" << "--" << cmd);
     subprocess.setProcessEnvironment(env);
 }
 
