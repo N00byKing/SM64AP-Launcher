@@ -31,8 +31,10 @@ RequirementHandler::RequirementHandler(QWidget* parent, bool padvanced) : QWidge
     QObject::connect(&check_requirements, &QPushButton::released, this, &RequirementHandler::checkRequirements);
     QObject::connect(&select_rom, &QPushButton::released, this, &RequirementHandler::registerROM);
     QObject::connect(&rewrite_config, &QPushButton::released, this, &Config::writeConfig);
+    #ifdef WIN32
     QObject::connect(&reinstall_msys, &QPushButton::released, this, &RequirementHandler::reinstallMSYS);
     QObject::connect(&reinstall_dependencies, &QPushButton::released, this, &RequirementHandler::reinstallDependencies);
+    #endif
     LogManager::forkLogTo(&this->log_output);
 }
 
