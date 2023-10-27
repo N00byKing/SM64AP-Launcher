@@ -42,7 +42,11 @@ class RequirementHandler : public QWidget {
             "mingw-w64-x86_64-cmake"
         };
         void closeEvent(QCloseEvent *event);
-        void checkRequirements();
+        #ifdef WIN32
+        void checkRequirementsMSYS();
+        #endif
+        void checkMSYSDependencyCallback(int);
+        void checkRequirementsROM();
         void registerROM();
         void setLocations();
         void setAdvanced(bool);

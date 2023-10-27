@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include <QCryptographicHash>
 #include <QFileDialog>
+#include <functional>
 
 #include "ConfigManager.h"
 #include "LogManager.h"
@@ -28,12 +29,14 @@ RequirementHandler::RequirementHandler(QWidget* parent, bool padvanced) : QWidge
     setWindowTitle("SM64APLauncher - Requirements and Debugging");
 
     // Connect things
-    QObject::connect(&check_requirements, &QPushButton::released, this, &RequirementHandler::checkRequirements);
     QObject::connect(&select_rom, &QPushButton::released, this, &RequirementHandler::registerROM);
     QObject::connect(&rewrite_config, &QPushButton::released, this, &Config::writeConfig);
     #ifdef WIN32
+    QObject::connect(&check_requirements, &QPushButton::released, this, &RequirementHandler::checkRequirementsMSYS);
     QObject::connect(&reinstall_msys, &QPushButton::released, this, &RequirementHandler::reinstallMSYS);
     QObject::connect(&reinstall_dependencies, &QPushButton::released, this, &RequirementHandler::reinstallDependencies);
+    #else
+    QObject::connect(&check_requirements, &QPushButton::released, this, &RequirementHandler::checkRequirementsROM);
     #endif
     LogManager::forkLogTo(&this->log_output);
 }
@@ -60,8 +63,8 @@ void RequirementHandler::setAdvanced(bool enabled) {
     #endif
 }
 
-void RequirementHandler::checkRequirements() {
-    #ifdef WIN32
+#ifdef WIN32
+void RequirementHandler::checkRequirementsMSYS() {
     QString msys_dir = QDir{QDir::cleanPath(msys_select.text())}.absolutePath();
     if (msys_dir.contains(" ")) {
         LogManager::writeToLog("Invalid MSYS Path: '" + msys_dir + "'\n");
@@ -76,8 +79,18 @@ void RequirementHandler::checkRequirements() {
         return;
     }
     Config::setMSYSPath(msys_dir);
-    // TODO install requirements
-    #endif
+
+    // Confirmed MSYS install dir, now check for dependencies. If successfull, it will continue checking ROMs after callback.
+    QString dependency_check_cmd = "pacman -Q";
+    for (QString dependency : dependencies) {
+        dependency_check_cmd += " " + dependency;
+    }
+    std::function<void(int)> callback = std::bind(&RequirementHandler::checkMSYSDependencyCallback, this, std::placeholders::_1);
+    PlatformRunner::runProcess(dependency_check_cmd, callback);
+}
+#endif
+
+void RequirementHandler::checkRequirementsROM() {
     QString us_rom_path = Config::getROMPath(BuildConfigurator::SM64_Region::US);
     QString jp_rom_path = Config::getROMPath(BuildConfigurator::SM64_Region::JP);
     // Check if ANY rom is registered
@@ -102,7 +115,23 @@ void RequirementHandler::checkRequirements() {
     CHECK_REG_ROMS(jp, JP)
 
     // All checks passed
+    #ifdef WIN32
     QMessageBox::information(this, "No issues found", "There seem to be no issues with your installation.");
+    #else
+    QMessageBox::information(this, "No issues found", "There seem to be no issues with your installation.\nHowever, dependencies are not checked on linux.");
+    #endif
+}
+
+void RequirementHandler::checkMSYSDependencyCallback(int exitcode) {
+    if (exitcode == 0) {
+        // Looks good. just continue with ROMs
+        checkRequirementsROM();
+    } else {
+        QMessageBox::StandardButton answer = QMessageBox::question(this, "Error getting dependencies", "There are either dependencies missing, or there was an error trying to get the info.\nWould you like to attempt an automatic installation?");
+        if (answer == QMessageBox::StandardButton::Yes) {
+            reinstallDependencies();
+        }
+    }
 }
 
 void RequirementHandler::registerROM() {
@@ -166,7 +195,7 @@ void RequirementHandler::reinstallDependencies() {
     // First, update MSYS
     std::function<void(int)> callback = std::bind(&RequirementHandler::updateMSYSCallback, this, std::placeholders::_1);
     PlatformRunner::runProcess("pacman -Syu --noconfirm", callback);
-    // Then, install dependencies
+    // Then, install dependencies in callback
 }
 
 void RequirementHandler::updateMSYSCallback(int exitcode) {
