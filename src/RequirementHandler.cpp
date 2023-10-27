@@ -211,7 +211,8 @@ void RequirementHandler::updateMSYSCallback(int exitcode) {
     enableInput(true);
     if (exitcode == 0) {
         std::function<void(int)> callback = std::bind(&RequirementHandler::installDependencyCallback, this, std::placeholders::_1);
-        QString dependency_install_cmd = "pacman -S --noconfirm";
+        // MSYS does two stage updates. Thus, also do update operation here even though actual goal is just reinstalling dependencies to avoid partial updates
+        QString dependency_install_cmd = "pacman -Syu --noconfirm";
         for (QString dependency : dependencies) {
             dependency_install_cmd += " " + dependency;
         }
