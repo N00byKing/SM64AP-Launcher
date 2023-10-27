@@ -65,10 +65,12 @@ void RequirementHandler::setAdvanced(bool enabled) {
 
 #ifdef WIN32
 void RequirementHandler::checkRequirementsMSYS() {
+    enableInput(false);
     QString msys_dir = QDir{QDir::cleanPath(msys_select.text())}.absolutePath();
     if (msys_dir.contains(" ")) {
         LogManager::writeToLog("Invalid MSYS Path: '" + msys_dir + "'\n");
         QMessageBox::critical(this,"Invalid MSYS Path", "The given MSYS path contains spaces. This is not allowed.");
+        enableInput(true);
         return;
     }
     if (!QFile::exists(msys_dir + "/usr/bin/bash.exe")) {
@@ -76,6 +78,7 @@ void RequirementHandler::checkRequirementsMSYS() {
         if (answer == QMessageBox::StandardButton::Yes) {
             reinstallMSYS();
         }
+        enableInput(true);
         return;
     }
     Config::setMSYSPath(msys_dir);
@@ -91,12 +94,14 @@ void RequirementHandler::checkRequirementsMSYS() {
 #endif
 
 void RequirementHandler::checkRequirementsROM() {
+    enableInput(false);
     QString us_rom_path = Config::getROMPath(BuildConfigurator::SM64_Region::US);
     QString jp_rom_path = Config::getROMPath(BuildConfigurator::SM64_Region::JP);
     // Check if ANY rom is registered
     if (us_rom_path == "_None") {
         if (jp_rom_path == "_None") {
             QMessageBox::critical(this, "No ROMs registered", "Set ROMs to use using the 'Register SM64 ROM' button");
+            enableInput(true);
             return;
         }
     }
@@ -120,6 +125,7 @@ void RequirementHandler::checkRequirementsROM() {
     #else
     QMessageBox::information(this, "No issues found", "There seem to be no issues with your installation.\nHowever, dependencies are not checked on linux.");
     #endif
+    enableInput(true);
 }
 
 void RequirementHandler::checkMSYSDependencyCallback(int exitcode) {
@@ -130,6 +136,8 @@ void RequirementHandler::checkMSYSDependencyCallback(int exitcode) {
         QMessageBox::StandardButton answer = QMessageBox::question(this, "Error getting dependencies", "There are either dependencies missing, or there was an error trying to get the info.\nWould you like to attempt an automatic installation?");
         if (answer == QMessageBox::StandardButton::Yes) {
             reinstallDependencies();
+        } else {
+            enableInput(true);
         }
     }
 }
