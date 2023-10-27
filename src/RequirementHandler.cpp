@@ -82,6 +82,7 @@ void RequirementHandler::checkRequirementsMSYS() {
         return;
     }
     Config::setMSYSPath(msys_dir);
+    LogManager::writeToLog("MSYS Path seems ok. Checking Dependencies...");
 
     // Confirmed MSYS install dir, now check for dependencies. If successfull, it will continue checking ROMs after callback.
     QString dependency_check_cmd = "pacman -Q";
