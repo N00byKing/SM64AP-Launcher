@@ -4,6 +4,7 @@
 #include <QDir>
 #include <QMessageBox>
 #include <QJsonDocument>
+#include <QCoreApplication>
 #include <QJsonObject>
 #include <vector>
 
@@ -12,7 +13,7 @@
 
 namespace Config {
 
-QFile config_file{"config.json",nullptr};
+QFile config_file;
 QJsonObject config;
 bool first_run = false;
 
@@ -28,6 +29,7 @@ void writeConfig() {
 bool isFirstRun() { return first_run; }
 
 bool initConfig() {
+    config_file.setFileName(QCoreApplication::applicationDirPath() + "/config.json");
     if (!config_file.exists()) { first_run = true; }
     if (!config_file.open(QIODeviceBase::ReadWrite)) {
         QMessageBox::critical(nullptr, "Could not read/write config file", "The config file is inaccessible.\nMake sure config.json is not write-protected or opened by another program.\nThe launcher will now exit.");
