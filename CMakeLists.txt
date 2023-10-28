@@ -29,7 +29,7 @@ set_target_properties(SM64APLauncher PROPERTIES
 )
 
 install(TARGETS SM64APLauncher DESTINATION SM64APLauncher_install)
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/presets DESTINATION SM64APLauncher_install)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/presets DESTINATION SM64APLauncher_install USE_SOURCE_PERMISSIONS)
 
 if(CMAKE_HOST_WIN32)
     add_custom_command(
