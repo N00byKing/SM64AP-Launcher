@@ -11,7 +11,7 @@ jobs:
 
     steps:
     - name: Clone repository recursively
-      uses: actions/checkout@v1
+      uses: actions/checkout@v4
       with:
         submodules: 'recursive'
     - name: Install Qt
@@ -31,6 +31,36 @@ jobs:
     - name: Create Build Artifact
       uses: actions/upload-artifact@v3
       with:
-        name: _dev_SM64AP-Launcher
+        name: _dev_windows_SM64AP-Launcher
+        path: |
+          install/*
+  
+  build-lin:
+    name: Build (ubuntu-latest)
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Clone repository recursively
+      uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v3.3.0
+      with:
+        version: '6.*'
+    - name: CMake configure
+      run: |
+        mkdir build
+        cd build
+        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX='../install' ..
+    - name: Build
+      run: |
+        cd build
+        cmake --build . --config Release --target INSTALL
+    - name: Create Build Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: _dev_linux_SM64AP-Launcher
         path: |
           install/*
