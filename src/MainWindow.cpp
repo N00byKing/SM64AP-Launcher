@@ -124,5 +124,6 @@ void MainWindow::startGame() {
         QMessageBox::information(this, "No build selected", "You need to select a build from the left first.\nIf there are none, create one with the buttons below.");
         return;
     }
-    PlatformRunner::runProcessDetached(QCoreApplication::applicationDirPath() + "/presets/run_game.sh '" + launch_options.toPlainText() + "'", selected_build);
+    QString no_newlines_args = launch_options.toPlainText().replace("\n", " ");
+    PlatformRunner::runProcessDetached(QCoreApplication::applicationDirPath() + "/presets/run_game.sh " + no_newlines_args, selected_build);
 }

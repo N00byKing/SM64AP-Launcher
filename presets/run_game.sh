@@ -5,7 +5,5 @@ FULL_BUILD_PATH="${BUILD_TARGET_DIR}/${BUILD_NAME}"
 
 cd "${FULL_BUILD_PATH}"
 cd 'build/'"${BUILD_REGION}"'_pc/'
-ARGS=$(echo "$@" | tr '\n' ' ')
-echo "${ARGS}"
 
-./sm64."${BUILD_REGION}".f3dex2e ${ARGS} &
+./sm64."${BUILD_REGION}".f3dex2e "$@" &
