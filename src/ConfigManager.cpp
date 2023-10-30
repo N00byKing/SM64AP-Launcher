@@ -6,6 +6,7 @@
 #include <QJsonDocument>
 #include <QCoreApplication>
 #include <QJsonObject>
+#include <QJsonArray>
 #include <vector>
 
 #include "version.h"
@@ -116,11 +117,18 @@ QString getBuildHome() {
 
 void registerBuild(BuildConfigurator::SM64_Build build) {
     QJsonObject builds = config["builds"].toObject();
-    QJsonObject build_o;
-    build_o["repo"] = build.repo;
-    build_o["branch"] = build.branch;
-    build_o["region"] = (build.region == BuildConfigurator::SM64_Region::US ? "US" : (build.region == BuildConfigurator::SM64_Region::JP ? "JP" : "!UNKNOWN!"));
-    build_o["directory"] = build.directory;
+    QJsonArray patches;
+    for (QString patch : build.patches)
+        patches.append(patch);
+    QJsonObject build_o =
+    {
+        {"repo", build.repo},
+        {"branch", build.branch},
+        {"directory", build.directory},
+        {"region", (build.region == BuildConfigurator::SM64_Region::US ? "US" : (build.region == BuildConfigurator::SM64_Region::JP ? "JP" : "!UNKNOWN!"))},
+        {"make_flags", build.make_flags},
+        {"patches", patches}
+    };
     builds[build.name] = build_o;
     config["builds"] = builds;
 }
@@ -144,10 +152,16 @@ std::map<QString,BuildConfigurator::SM64_Build> getBuilds() {
     for (QString name : config["builds"].toObject().keys()) {
         BuildConfigurator::SM64_Build build;
         build.name = name;
-        build.repo = config["builds"][build.name]["repo"].toString();
-        build.branch = config["builds"][build.name]["branch"].toString();
-        build.directory = config["builds"][build.name]["directory"].toString();
-        build.region = config["builds"][build.name]["region"].toString() == "US" ? BuildConfigurator::SM64_Region::US : (config["builds"][build.name]["region"].toString() == "JP" ? BuildConfigurator::SM64_Region::JP : BuildConfigurator::SM64_Region::Undef);
+        QJsonValue build_o = config["builds"][build.name];
+
+        build.repo = build_o["repo"].toString();
+        build.branch = build_o["branch"].toString();
+        build.directory = build_o["directory"].toString();
+        build.region = build_o["region"].toString() == "US" ? BuildConfigurator::SM64_Region::US : (build_o["region"].toString() == "JP" ? BuildConfigurator::SM64_Region::JP : BuildConfigurator::SM64_Region::Undef);
+        build.make_flags = build_o["make_flags"].toString();
+        for (QJsonValue patch_o : build_o["patches"].toArray()) {
+            build.patches.append(patch_o.toString());
+        }
         builds[build.name] = build;
     }
     return builds;

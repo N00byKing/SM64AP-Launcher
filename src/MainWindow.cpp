@@ -8,6 +8,7 @@
 #include <QListWidget>
 #include <QMessageBox>
 #include <QObject>
+#include <QFileInfo>
 #include <memory>
 #include <map>
 
@@ -114,7 +115,12 @@ void MainWindow::buildSelectionHandler(QListWidgetItem *current, QListWidgetItem
                  "Repo: " + selected_build.repo
         + "\n" + "Branch: " + selected_build.branch
         + "\n" + "Region: " + (selected_build.region == BuildConfigurator::SM64_Region::US ? "US" : (selected_build.region == BuildConfigurator::SM64_Region::JP ? "JP" : "!UNKNOWN!"))
-        + "\n" + "Directory: " + selected_build.directory;
+        + "\n" + "Directory: " + selected_build.directory
+        + "\n" + "Make Flags: " + selected_build.make_flags;
+    build_info_string += "\nPatches: ";
+    for (QString patch : selected_build.patches) {
+        build_info_string += QFileInfo(patch).fileName() + " ";
+    }
     play_build.setEnabled(true);
     selected_build_info.setPlainText(build_info_string);
 }
