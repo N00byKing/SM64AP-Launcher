@@ -132,7 +132,7 @@ void BuildConfigurator::confirmAndDownloadRepo() {
     LogManager::writeToLog("### Data end, starting download ###\n");
     // START DOWNLOAD
     std::function<void(int)> callback = std::bind(&BuildConfigurator::DLFinishCallback, this, std::placeholders::_1);
-    PlatformRunner::runProcess(QCoreApplication::applicationDirPath() + "/presets/repo_dl.sh", active_build, callback);
+    PlatformRunner::runProcess("'" + QCoreApplication::applicationDirPath() + "/presets/repo_dl.sh'", active_build, callback);
 }
 
 void BuildConfigurator::DLFinishCallback(int exitcode) {
@@ -160,7 +160,7 @@ void BuildConfigurator::compileBuild() {
     std::function<void(int)> callback = std::bind(&BuildConfigurator::CompileFinishCallback, this, std::placeholders::_1);
     active_build.region = region_select.currentText() == "US" ? BuildConfigurator::SM64_Region::US : (region_select.currentText() == "JP" ? BuildConfigurator::SM64_Region::JP : BuildConfigurator::SM64_Region::Undef);
     active_build.make_flags = make_flags.text();
-    PlatformRunner::runProcess(QCoreApplication::applicationDirPath() + "/presets/compile_build.sh", active_build, callback);
+    PlatformRunner::runProcess("'" + QCoreApplication::applicationDirPath() + "/presets/compile_build.sh'", active_build, callback);
 }
 
 void BuildConfigurator::enableCompileInput(bool enable) {

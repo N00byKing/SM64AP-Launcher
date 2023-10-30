@@ -125,5 +125,5 @@ void MainWindow::startGame() {
         return;
     }
     QString no_newlines_args = launch_options.toPlainText().replace("\n", " ");
-    PlatformRunner::runProcessDetached(QCoreApplication::applicationDirPath() + "/presets/run_game.sh " + no_newlines_args, selected_build);
+    PlatformRunner::runProcessDetached("'" + QCoreApplication::applicationDirPath() + "/presets/run_game.sh' " + no_newlines_args, selected_build);
 }
