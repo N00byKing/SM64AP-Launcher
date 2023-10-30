@@ -46,6 +46,7 @@ BuildConfigurator::BuildConfigurator(QWidget* parent, bool padvanced) : QMainWin
     QObject::connect(&target_directory_button, &QPushButton::released, this, &BuildConfigurator::selectTargetDirectory);
     QObject::connect(&download_files, &QPushButton::released, this, &BuildConfigurator::confirmAndDownloadRepo);
     QObject::connect(&start_compile, &QPushButton::released, this, &BuildConfigurator::compileBuild);
+    QObject::connect(&apply_patches, &QPushButton::released, this, &BuildConfigurator::selectAndApplyPatches);
 
     // Link logs to output
     LogManager::forkLogTo(&this->subprocess_output);
@@ -66,15 +67,17 @@ void BuildConfigurator::setLocations() {
     subprocess_output.setGeometry(500,30,570,400);
     region_select.setGeometry(30,300,180,30);
     region_select_label.setGeometry(300,300,180,30);
-    make_flags.setGeometry(30,340,180,30);
+    make_flags.setGeometry(30,340,250,30);
     make_flags_label.setGeometry(300,340,180,30);
-    start_compile.setGeometry(30,380,180,30);
+    apply_patches.setGeometry(30,380,180,30);
+    start_compile.setGeometry(30,420,180,30);
 }
 
 void BuildConfigurator::setAdvanced(bool enabled) {
     repo_select.setEnabled(enabled);
     branch_select.setEnabled(enabled);
     make_flags.setEnabled(enabled);
+    apply_patches.setEnabled(enabled);
 }
 
 void BuildConfigurator::closeEvent(QCloseEvent *event) {
@@ -135,9 +138,36 @@ void BuildConfigurator::confirmAndDownloadRepo() {
     PlatformRunner::runProcess("'" + QCoreApplication::applicationDirPath() + "/presets/repo_dl.sh'", active_build, callback);
 }
 
+void BuildConfigurator::selectAndApplyPatches() {
+    enableCompileInput(false);
+    active_build.patches = QFileDialog::getOpenFileNames(this, "Select Patch Files", active_build.directory + "/" + active_build.name + "/enhancements", "Patch Files (*.patch)");
+    if (active_build.patches.empty()) {
+        QMessageBox::information(this, "No patches selected", "No patches were selected, none will be applied.");
+        enableCompileInput(true);
+        return;
+    }
+    LogManager::writeToLog("### Applying Patches ###\n");
+    for (QString patch : active_build.patches) {
+        QFileInfo patch_file(patch);
+        LogManager::writeToLog("Patch: " + patch_file.fileName() + " [" + patch_file.absoluteFilePath() + "]" + "\n");
+    }
+    std::function<void(int)> callback = std::bind(&BuildConfigurator::PatchApplyCallback, this, std::placeholders::_1);
+    PlatformRunner::runProcess("'" + QCoreApplication::applicationDirPath() + "/presets/apply_patches.sh'", active_build, callback);
+}
+
+void BuildConfigurator::PatchApplyCallback(int exitcode) {
+    if (exitcode == 0) {
+        QMessageBox::information(this, "Patch application successfull", "There were no errors when applying the patches.");
+    } else {
+        QMessageBox::critical(this, "Error applying patches", "There were errors when applying the patches. Patches will be rolled back.\nPlease wait until you see 'Repo Reset' in the log window!");
+        PlatformRunner::runProcess("'" + QCoreApplication::applicationDirPath() + "/presets/reset_repo.sh'", active_build, nullptr);
+    }
+    enableCompileInput(true);
+}
+
 void BuildConfigurator::DLFinishCallback(int exitcode) {
     LogManager::flush();
-    this->setEnabled(true);
+    enableDLInput(false);
     if (exitcode == 0) {
         LogManager::writeToLog("Repo downloaded successfully.\n");
         Config::setBuildHome(active_build.directory);
@@ -167,6 +197,9 @@ void BuildConfigurator::enableCompileInput(bool enable) {
     start_compile.setEnabled(enable);
     region_select.setEnabled(enable);
     make_flags.setEnabled(enable && advanced);
+    if (active_build.patches.empty()) {
+        apply_patches.setEnabled(enable && advanced);
+    }
 }
 
 void BuildConfigurator::CompileFinishCallback(int exitcode) {

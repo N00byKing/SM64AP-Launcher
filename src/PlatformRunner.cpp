@@ -82,6 +82,11 @@ QProcessEnvironment __setup_env(BuildConfigurator::SM64_Build* build) {
         env.insert("BUILD_ROM", Config::getROMPath(BuildConfigurator::SM64_Region::JP));
     }
     env.insert("BUILD_MAKE_FLAGS", build->make_flags);
+    QString patch_list;
+    for (QString patch : build->patches) {
+        patch_list += patch + '\n';
+    }
+    env.insert("BUILD_PATCHES", patch_list);
     return env;
 }
 
