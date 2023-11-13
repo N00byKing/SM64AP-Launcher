@@ -4,6 +4,8 @@
 #include <QDir>
 #include <QStringList>
 #include <QObject>
+#include <QCoreApplication>
+
 #include <functional>
 #include <string>
 
@@ -99,6 +101,7 @@ void __setup_process(QProcess& subprocess, QString cmd, QProcessEnvironment cons
     subprocess.setProgram("bash");
     subprocess.setArguments(QStringList() << "-c" << "--" << cmd);
     #endif
+    subprocess.setWorkingDirectory(QCoreApplication::applicationDirPath());
     subprocess.setProcessEnvironment(env);
 }
 

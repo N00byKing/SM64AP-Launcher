@@ -9,6 +9,7 @@
 #include <QCoreApplication>
 #include <QFontDatabase>
 #include <functional>
+
 #include <string>
 #include <vector>
 
@@ -22,7 +23,7 @@ std::string window_title_base = "Build Configurator - ";
 BuildConfigurator::BuildConfigurator(QWidget* parent, bool padvanced) : QMainWindow(parent, Qt::Window) {
     // Load config
     QString default_home = Config::getBuildHome();
-    if (default_home != "_None") {
+    if (default_home != "_None" && default_home != "") {
         target_directory_selected_label.setText(default_home);
     }
     if (Config::getROMPath(BuildConfigurator::SM64_Region::US) != "_None")
@@ -88,7 +89,9 @@ void BuildConfigurator::closeEvent(QCloseEvent *event) {
 
 void BuildConfigurator::selectTargetDirectory() {
     QString directory = QFileDialog::getExistingDirectory(this, "Select Target Directory");
-    target_directory_selected_label.setText(directory);
+    if (directory != "") {
+        target_directory_selected_label.setText(directory);
+    }
 }
 
 void BuildConfigurator::confirmAndDownloadRepo() {
@@ -135,7 +138,7 @@ void BuildConfigurator::confirmAndDownloadRepo() {
     LogManager::writeToLog("### Data end, starting download ###\n");
     // START DOWNLOAD
     std::function<void(int)> callback = std::bind(&BuildConfigurator::DLFinishCallback, this, std::placeholders::_1);
-    PlatformRunner::runProcess("'" + QCoreApplication::applicationDirPath() + "/presets/repo_dl.sh'", active_build, callback);
+    PlatformRunner::runProcess("./presets/repo_dl.sh", active_build, callback);
 }
 
 void BuildConfigurator::selectAndApplyPatches() {
@@ -152,7 +155,7 @@ void BuildConfigurator::selectAndApplyPatches() {
         LogManager::writeToLog("Patch: " + patch_file.fileName() + " [" + patch_file.absoluteFilePath() + "]" + "\n");
     }
     std::function<void(int)> callback = std::bind(&BuildConfigurator::PatchApplyCallback, this, std::placeholders::_1);
-    PlatformRunner::runProcess("'" + QCoreApplication::applicationDirPath() + "/presets/apply_patches.sh'", active_build, callback);
+    PlatformRunner::runProcess("./presets/apply_patches.sh", active_build, callback);
 }
 
 void BuildConfigurator::PatchApplyCallback(int exitcode) {
@@ -160,7 +163,7 @@ void BuildConfigurator::PatchApplyCallback(int exitcode) {
         QMessageBox::information(this, "Patch application successfull", "There were no errors when applying the patches.");
     } else {
         QMessageBox::critical(this, "Error applying patches", "There were errors when applying the patches. Patches will be rolled back.\nPlease wait until you see 'Repo Reset' in the log window!");
-        PlatformRunner::runProcess("'" + QCoreApplication::applicationDirPath() + "/presets/reset_repo.sh'", active_build, nullptr);
+        PlatformRunner::runProcess("./presets/reset_repo.sh", active_build, nullptr);
     }
     enableCompileInput(true);
 }
@@ -191,7 +194,7 @@ void BuildConfigurator::compileBuild() {
     active_build.region = region_select.currentText() == "US" ? BuildConfigurator::SM64_Region::US : (region_select.currentText() == "JP" ? BuildConfigurator::SM64_Region::JP : BuildConfigurator::SM64_Region::Undef);
     active_build.make_flags = make_flags.text();
     LogManager::writeToLog("### Compiling Build ###\n");
-    PlatformRunner::runProcess("'" + QCoreApplication::applicationDirPath() + "/presets/compile_build.sh'", active_build, callback);
+    PlatformRunner::runProcess("./presets/compile_build.sh", active_build, callback);
 }
 
 void BuildConfigurator::enableCompileInput(bool enable) {

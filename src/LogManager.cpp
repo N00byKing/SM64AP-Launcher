@@ -3,6 +3,7 @@
 #include <QMessageBox>
 #include <QFile>
 #include <QString>
+#include <QCoreApplication>
 
 #include "BuildConfigurator.h"
 #include "OutputWidget.h"
@@ -11,10 +12,11 @@
 namespace LogManager {
 
 bool is_init = false;
-QFile logs{"logs.txt", nullptr};
+QFile logs;
 OutputWidget* forklog = nullptr;
 
 void initLogs() {
+    logs.setFileName(QCoreApplication::applicationDirPath() + "/logs.txt");
     if (!logs.open(QIODeviceBase::Truncate | QIODeviceBase::ReadWrite)) {
             QMessageBox::critical(nullptr, "Could not open Log", "The log file is inaccessible. This may indicate further issues.");
     }
