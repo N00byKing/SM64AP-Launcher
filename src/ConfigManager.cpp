@@ -127,7 +127,8 @@ void registerBuild(BuildConfigurator::SM64_Build build) {
         {"directory", build.directory},
         {"region", (build.region == BuildConfigurator::SM64_Region::US ? "US" : (build.region == BuildConfigurator::SM64_Region::JP ? "JP" : "!UNKNOWN!"))},
         {"make_flags", build.make_flags},
-        {"patches", patches}
+        {"patches", patches},
+        {"launch_opts", build.default_launch_opts}
     };
     builds[build.name] = build_o;
     config["builds"] = builds;
@@ -162,6 +163,7 @@ std::map<QString,BuildConfigurator::SM64_Build> getBuilds() {
         for (QJsonValue patch_o : build_o["patches"].toArray()) {
             build.patches.append(patch_o.toString());
         }
+        build.default_launch_opts = build_o["launch_opts"].toString();
         builds[build.name] = build;
     }
     return builds;

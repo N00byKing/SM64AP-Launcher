@@ -29,7 +29,11 @@ MainWindow::MainWindow() {
 
     build_list.setSelectionMode(QListWidget::SingleSelection);
     selected_build_info.setReadOnly(true);
+
     play_build.setEnabled(false);
+    launch_options.setEnabled(false);
+
+    save_launch_opts.setChecked(true);
 
     setWindowTitle("SM64APLauncher - Main Window");
 
@@ -50,10 +54,11 @@ void MainWindow::setLocations() {
     build_info_label.setGeometry(30,140,150,30);
     selected_build_info.setGeometry(30,170,460,100);
     play_build.setGeometry(550,40,200,30);
-    create_default_build.setGeometry(550,100,200,30);
-    create_custom_build.setGeometry(550,140,200,30);
-    recheck_requirements.setGeometry(550,180,200,30);
-    use_advanced.setGeometry(555, 270, 200, 30);
+    save_launch_opts.setGeometry(550, 70, 200,30);
+    create_default_build.setGeometry(550,120,200,30);
+    create_custom_build.setGeometry(550,160,200,30);
+    recheck_requirements.setGeometry(550,200,200,30);
+    use_advanced.setGeometry(555, 270, 220, 30);
 }
 
 void MainWindow::setAdvanced(bool enable) {
@@ -111,6 +116,8 @@ void MainWindow::buildSelectionHandler(QListWidgetItem *current, QListWidgetItem
     QString selected_build_name = current->text();
     if (selected_build_name.contains("No builds")) return;
     selected_build = Config::getBuilds()[selected_build_name];
+
+    // Build Info String for textbox
     QString build_info_string =
                  "Repo: " + selected_build.repo
         + "\n" + "Branch: " + selected_build.branch
@@ -121,14 +128,24 @@ void MainWindow::buildSelectionHandler(QListWidgetItem *current, QListWidgetItem
     for (QString patch : selected_build.patches) {
         build_info_string += QFileInfo(patch).fileName() + " ";
     }
-    play_build.setEnabled(true);
     selected_build_info.setPlainText(build_info_string);
+
+    // Set launch options
+    launch_options.setPlainText(selected_build.default_launch_opts);
+
+    play_build.setEnabled(true);
+    launch_options.setEnabled(true);
 }
 
 void MainWindow::startGame() {
     if (selected_build.name == "_None") {
         QMessageBox::information(this, "No build selected", "You need to select a build from the left first.\nIf there are none, create one with the buttons below.");
         return;
+    }
+    if (save_launch_opts.isChecked()) {
+        selected_build.default_launch_opts = launch_options.toPlainText();
+        Config::registerBuild(selected_build);
+        Config::writeConfig();
     }
     QString no_newlines_args = launch_options.toPlainText().replace("\n", " ");
     PlatformRunner::runProcessDetached("./presets/run_game.sh " + no_newlines_args, selected_build);

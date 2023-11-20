@@ -17,6 +17,7 @@ class MainWindow : public QMainWindow {
     private:
         using QMainWindow::QMainWindow;
         QPushButton play_build{"Play selected build",this};
+        QCheckBox save_launch_opts{"Save launch options", this};
         QPushButton create_default_build{"Compile default SM64AP build", this};
         QPushButton create_custom_build{"Compile custom build", this};
         QPushButton recheck_requirements{"Re-check requirements", this};
@@ -26,7 +27,7 @@ class MainWindow : public QMainWindow {
         QLabel build_info_label{"Build Info:",this};
         QPlainTextEdit selected_build_info{"No build selected", this};
         QLabel launch_options_label{"Launch Options:",this};
-        QPlainTextEdit launch_options{"--sm64ap_name NAME\n--sm64ap_ip archipelago.gg:PORT",this};
+        QPlainTextEdit launch_options{this};
         // Other
         std::unique_ptr<BuildConfigurator> configurator;
         std::unique_ptr<RequirementHandler> requirement_handler;
