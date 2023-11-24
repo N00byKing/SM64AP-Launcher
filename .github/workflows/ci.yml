@@ -31,7 +31,7 @@ jobs:
     - name: Create Build Artifact
       uses: actions/upload-artifact@v3
       with:
-        name: _dev_windows_SM64AP-Launcher
+        name: SM64AP-Launcher_windows
         path: |
           install/*
   
@@ -61,6 +61,6 @@ jobs:
     - name: Create Build Artifact
       uses: actions/upload-artifact@v3
       with:
-        name: _dev_linux_SM64AP-Launcher
+        name: SM64AP-Launcher_linux
         path: |
           install/*
