@@ -55,14 +55,25 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX='../install' ..
+        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX='/usr' ..
     - name: Build
       run: |
         cd build
-        cmake --build . --config Release --target install
+        cmake --build . --config Release --target install DESTDIR=AppDir
+    - name: Install linuxdeploy
+      uses: miurahr/install-linuxdeploy-action@v1.7.0
+      with:
+        plugins: qt appimage
+    - name: Install AppImage dependencies
+      run: |
+        sudo apt update && sudo apt install appstream libfuse2
+    - name: Create AppImage
+      run: |
+        cd build
+        linuxdeploy-x86_64.AppImage --appdir AppDir --desktop-file=../res/SM64APLauncher.desktop --icon-file=../res/icon.png --output appimage
     - name: Create Build Artifact
       uses: actions/upload-artifact@v3
       with:
         name: SM64AP-Launcher_linux
         path: |
-          install/*
+          build/SM64AP_Launcher-x86_64.AppImage
