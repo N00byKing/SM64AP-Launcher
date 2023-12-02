@@ -1,0 +1,13 @@
+[Desktop Entry]
+
+Type=Application
+
+Name=SM64AP Launcher
+
+Exec=SM64APLauncher
+
+Terminal=false
+
+Categories=Game
+
+Icon=icon
