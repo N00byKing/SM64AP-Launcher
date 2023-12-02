@@ -31,7 +31,11 @@ void writeConfig() {
 bool isFirstRun() { return first_run; }
 
 bool initConfig() {
+    #ifdef WIN32
+    config_file.setFileName(QCoreApplication::applicationDirPath() + "/SM64APLauncher_config.json");
+    #else
     config_file.setFileName(QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/SM64APLauncher_config.json");
+    #endif
     if (!config_file.exists()) { first_run = true; }
     if (!config_file.open(QIODeviceBase::ReadWrite)) {
         QMessageBox::critical(nullptr, "Could not read/write config file", "The config file is inaccessible.\nMake sure config.json is not write-protected or opened by another program.\nThe launcher will now exit.");
