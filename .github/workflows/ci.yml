@@ -31,7 +31,7 @@ jobs:
         cmake --build . --config Release --target install
     - name: Deploy Windows
       run: |
-        windeployqt.exe --release --compiler-runtime --dir launcher_deploy install/bin/SM64APLauncher
+        windeployqt.exe --release --compiler-runtime --dir launcher_deploy install/bin/SM64APLauncher.exe
         cp -r presets/ launcher_deploy
     - name: Create Build Artifact
       uses: actions/upload-artifact@v3
