@@ -29,12 +29,16 @@ jobs:
       run: |
         cd build
         cmake --build . --config Release --target install
+    - name: Deploy Windows
+      run: |
+        windeployqt.exe --release --compiler-runtime --dir launcher_deploy install/bin/SM64APLauncher
+        cp -r presets/ launcher_deploy
     - name: Create Build Artifact
       uses: actions/upload-artifact@v3
       with:
         name: SM64AP-Launcher_windows
         path: |
-          install/*
+          launcher_deploy/*
   
   build-lin:
     name: Build (ubuntu-latest)
