@@ -71,7 +71,8 @@ jobs:
         plugins: qt appimage
     - name: Install AppImage dependencies
       run: |
-        sudo apt update && sudo apt install appstream libfuse2
+        sudo apt update && sudo apt install appstream libfuse2 # Dependencies to run appimages at all
+        sudo apt install libxcb-cursor0 # One of the libraries to be bundled, but not present by default
     - name: Create AppImage
       run: |
         cd build
