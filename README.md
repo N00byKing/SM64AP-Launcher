@@ -1,6 +1,6 @@
 # SM64AP-Launcher
 
-A launcher specialising in the [Archipelago](archipelago.gg) build of sm64ex, but capable of building most sm64 PC ports.
+A launcher specialising in the [Archipelago](https://archipelago.gg) build of sm64ex, but capable of building most sm64 PC ports.
 
 ## Releases
 
