@@ -7,6 +7,7 @@
 #include <QWidget>
 #include <QListWidget>
 #include <QMessageBox>
+#include <QFile>
 #include <QObject>
 #include <QFileInfo>
 #include <memory>
@@ -140,6 +141,10 @@ void MainWindow::buildSelectionHandler(QListWidgetItem *current, QListWidgetItem
 void MainWindow::startGame() {
     if (selected_build.name == "_None") {
         QMessageBox::information(this, "No build selected", "You need to select a build from the left first.\nIf there are none, create one with the buttons below.");
+        return;
+    }
+    if (!QFile::exists(selected_build.directory + "/" + selected_build.name)) {
+        QMessageBox::critical(this, "Build not found", "The build folder does not seem to exist. Did you move / rename it?");
         return;
     }
     if (save_launch_opts.isChecked()) {
