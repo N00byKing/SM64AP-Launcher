@@ -144,7 +144,7 @@ void MainWindow::startGame() {
         return;
     }
     if (!QFile::exists(selected_build.directory + "/" + selected_build.name)) {
-        QMessageBox::critical(this, "Build not found", "The build folder does not seem to exist. Did you move / rename it?");
+        QMessageBox::critical(this, "Build not found", "The build folder does not seem to exist. Did you move / rename it?\n Not in: '" + selected_build.directory + "/" + selected_build.name + "'");
         return;
     }
     if (save_launch_opts.isChecked()) {
