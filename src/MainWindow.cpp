@@ -79,14 +79,18 @@ void MainWindow::parseBuilds() {
 
 void MainWindow::spawnDefaultConfigurator() {
     configurator = std::make_unique<BuildConfigurator>(this,false);
+    this->setEnabled(false);
+    configurator->setEnabled(true);
     configurator->show();
-    this->hide();
+    //this->hide();
 }
 
 void MainWindow::spawnAdvancedConfigurator() {
     configurator = std::make_unique<BuildConfigurator>(this,true);
+    this->setEnabled(false);
+    configurator->setEnabled(true);
     configurator->show();
-    this->hide();
+    //this->hide();
 }
 
 void MainWindow::spawnRequirementHandler() {
