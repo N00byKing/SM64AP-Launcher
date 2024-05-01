@@ -82,7 +82,6 @@ void MainWindow::spawnDefaultConfigurator() {
     this->setEnabled(false);
     configurator->setEnabled(true);
     configurator->show();
-    //this->hide();
 }
 
 void MainWindow::spawnAdvancedConfigurator() {
@@ -90,7 +89,6 @@ void MainWindow::spawnAdvancedConfigurator() {
     this->setEnabled(false);
     configurator->setEnabled(true);
     configurator->show();
-    //this->hide();
 }
 
 void MainWindow::spawnRequirementHandler() {
