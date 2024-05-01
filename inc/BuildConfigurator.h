@@ -10,7 +10,7 @@
 #include <QPlainTextEdit>
 #include <QMainWindow>
 
-class BuildConfigurator : public QMainWindow {
+class BuildConfigurator : public QWidget {
     public:
         static constexpr int window_w = 1100;
         static constexpr int window_h = 500;
@@ -32,7 +32,7 @@ class BuildConfigurator : public QMainWindow {
         };
         void printToUser(QString str);
     private:
-        using QMainWindow::QMainWindow;
+        using QWidget::QWidget;
 
         QLineEdit repo_select{"https://github.com/N00byKing/sm64ex", this};
         QLabel repo_select_label{"Repository", this};

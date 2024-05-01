@@ -20,7 +20,7 @@
 
 std::string window_title_base = "Build Configurator - ";
 
-BuildConfigurator::BuildConfigurator(QWidget* parent, bool padvanced) : QMainWindow(parent, Qt::Window) {
+BuildConfigurator::BuildConfigurator(QWidget* parent, bool padvanced) : QWidget(parent, Qt::Window) {
     // Load config
     QString default_home = Config::getBuildHome();
     if (default_home != "_None" && default_home != "") {
@@ -83,7 +83,7 @@ void BuildConfigurator::setAdvanced(bool enabled) {
 
 void BuildConfigurator::closeEvent(QCloseEvent *event) {
     LogManager::unlinkFork();
-    parentWidget()->show();
+    parentWidget()->setEnabled(true);
     // No need to delete now. MainWindow will, either on close or on regen
 }
 
