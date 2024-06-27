@@ -15,7 +15,7 @@ jobs:
       with:
         submodules: 'recursive'
     - name: Install Qt
-      uses: jurplel/install-qt-action@v3.3.0
+      uses: jurplel/install-qt-action@v4
       with:
         version: '6.*'
         cache: 'true'
