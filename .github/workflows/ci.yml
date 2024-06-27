@@ -52,9 +52,9 @@ jobs:
       with:
         submodules: 'recursive'
     - name: Install Qt
-      uses: jurplel/install-qt-action@v3.3.0
+      uses: jurplel/install-qt-action@v4
       with:
-        version: '6.*'
+        version: '6.7.*'
         cache: 'true'
     - name: CMake configure
       run: |
