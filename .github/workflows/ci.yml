@@ -17,7 +17,7 @@ jobs:
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
       with:
-        version: '6.7.*'
+        version: '6.6.*'
         cache: 'true'
     - name: CMake configure
       run: |
@@ -54,7 +54,7 @@ jobs:
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
       with:
-        version: '6.7.*'
+        version: '6.6.*'
         cache: 'true'
     - name: CMake configure
       run: |
