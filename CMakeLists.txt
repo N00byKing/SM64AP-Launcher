@@ -15,6 +15,7 @@ qt_add_executable(SM64APLauncher
     src/main.cpp
     src/MainWindow.cpp
     src/BuildConfigurator.cpp
+    src/BuildManager.cpp
     src/LogManager.cpp
     src/RequirementHandler.cpp
     src/ConfigManager.cpp

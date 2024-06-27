@@ -110,7 +110,7 @@ void RequirementHandler::checkRequirementsROM() {
     #define CHECK_REG_ROMS(region_small,region_large) \
         if (region_small##_rom_path != "_None" && !QFile( region_small##_rom_path).exists()) { \
             QMessageBox::StandardButton answer = QMessageBox::question(this, "ROM not found", "A registered ROM for region " #region_large " was not found. Reset entry from config?"); \
-            if (answer == QMessageBox::StandardButton::Ok) { \
+            if (answer == QMessageBox::StandardButton::Yes) { \
                 Config::setROMPath("_None", BuildConfigurator::SM64_Region:: region_large); \
             } \
         } \
@@ -178,9 +178,9 @@ BuildConfigurator::SM64_Region RequirementHandler::identifyROM(QString rom_file_
     }
     QString rom_sha1 = QCryptographicHash::hash(rom_file.readAll(),QCryptographicHash::Algorithm::Sha1).toHex();
     rom_file.close();
-    if (rom_sha1 == "9bef1128717f958171a4afac3ed78ee2bb4e86ce") {
+    if (rom_sha1.toStdString() == US_ROM_HASH) {
         return BuildConfigurator::SM64_Region::US;
-    } else if (rom_sha1 == "8a20a5c83d6ceb0f0506cfc9fa20d8f438cafe51") {
+    } else if (rom_sha1.toStdString() == JP_ROM_HASH) {
         return BuildConfigurator::SM64_Region::JP;
     } else {
         return BuildConfigurator::SM64_Region::Undef;

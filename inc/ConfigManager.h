@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+#include <QWidget>
 #include <QString>
 
 #include "BuildConfigurator.h"
@@ -14,8 +14,10 @@ namespace Config {
     bool initConfig();
     void writeConfig();
     void resetToDefault();
-    void registerBuild(BuildConfigurator::SM64_Build);
+    void registerBuild(BuildConfigurator::SM64_Build const&);
+    void renameBuild(QWidget*,BuildConfigurator::SM64_Build&);
     void removeBuild(QWidget*,QString);
+    void moveBuild(QWidget*,BuildConfigurator::SM64_Build&);
     std::map<QString, BuildConfigurator::SM64_Build> getBuilds();
     void setAdvanced(bool);
     bool isAdvanced();

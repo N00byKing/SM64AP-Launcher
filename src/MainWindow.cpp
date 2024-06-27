@@ -13,6 +13,7 @@
 #include <memory>
 #include <map>
 
+#include "BuildManager.h"
 #include "ConfigManager.h"
 #include "BuildConfigurator.h"
 #include "PlatformRunner.h"
@@ -32,6 +33,7 @@ MainWindow::MainWindow() {
     selected_build_info.setReadOnly(true);
 
     play_build.setEnabled(false);
+    manage_build.setEnabled(false);
     launch_options.setEnabled(false);
 
     save_launch_opts.setChecked(true);
@@ -41,6 +43,7 @@ MainWindow::MainWindow() {
     // Connect things
     QObject::connect(&use_advanced, &QCheckBox::toggled, this, &MainWindow::setAdvanced);
     QObject::connect(&play_build, &QPushButton::released, this, &MainWindow::startGame);
+    QObject::connect(&manage_build, &QPushButton::released, this, &MainWindow::spawnBuildManager);
     QObject::connect(&create_default_build, &QPushButton::released, this, &MainWindow::spawnDefaultConfigurator);
     QObject::connect(&create_custom_build, &QPushButton::released, this, &MainWindow::spawnAdvancedConfigurator);
     QObject::connect(&recheck_requirements, &QPushButton::released, this, &MainWindow::spawnRequirementHandler);
@@ -56,9 +59,10 @@ void MainWindow::setLocations() {
     selected_build_info.setGeometry(30,170,460,100);
     play_build.setGeometry(550,40,200,30);
     save_launch_opts.setGeometry(550, 70, 200,30);
-    create_default_build.setGeometry(550,120,200,30);
-    create_custom_build.setGeometry(550,160,200,30);
-    recheck_requirements.setGeometry(550,200,200,30);
+    manage_build.setGeometry(550,100,200,30);
+    create_default_build.setGeometry(550,160,200,30);
+    create_custom_build.setGeometry(550,200,200,30);
+    recheck_requirements.setGeometry(550,240,200,30);
     use_advanced.setGeometry(555, 270, 220, 30);
 }
 
@@ -75,6 +79,17 @@ void MainWindow::parseBuilds() {
     }
     if (build_list.count() == 0)
         build_list.addItem("No builds!\nCreate a new one.");
+}
+
+void MainWindow::spawnBuildManager() {
+    if (selected_build.name == "_None") {
+        QMessageBox::information(this, "No build selected", "You need to select a build from the left first.\nIf there are none, create one with the buttons below.");
+        return;
+    }
+    build_manager = std::make_unique<BuildManager>(this, selected_build, use_advanced.isChecked());
+    this->setEnabled(false);
+    build_manager->setEnabled(true);
+    build_manager->show();
 }
 
 void MainWindow::spawnDefaultConfigurator() {
@@ -103,6 +118,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
     Config::writeConfig();
     configurator.reset();
     requirement_handler.reset();
+    build_manager.reset();
 }
 
 void MainWindow::showEvent(QShowEvent *event) {
@@ -115,7 +131,12 @@ void MainWindow::showEvent(QShowEvent *event) {
     parseBuilds();
 }
 
+void MainWindow::changeEvent(QEvent *event) {
+    if (event->type() == QEvent::EnabledChange) parseBuilds();
+}
+
 void MainWindow::buildSelectionHandler(QListWidgetItem *current, QListWidgetItem *previous) {
+    if (!current) return;
     QString selected_build_name = current->text();
     if (selected_build_name.contains("No builds")) return;
     selected_build = Config::getBuilds()[selected_build_name];
@@ -137,6 +158,7 @@ void MainWindow::buildSelectionHandler(QListWidgetItem *current, QListWidgetItem
     launch_options.setPlainText(selected_build.default_launch_opts);
 
     play_build.setEnabled(true);
+    manage_build.setEnabled(true);
     launch_options.setEnabled(true);
 }
 

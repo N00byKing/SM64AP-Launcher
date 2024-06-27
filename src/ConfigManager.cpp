@@ -8,8 +8,10 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QStandardPaths>
-#include <vector>
+#include <QFileDialog>
+#include <QInputDialog>
 
+#include "LogManager.h"
 #include "version.h"
 #include "BuildConfigurator.h"
 
@@ -120,7 +122,7 @@ QString getBuildHome() {
     return config["default_build_root"].toString();
 }
 
-void registerBuild(BuildConfigurator::SM64_Build build) {
+void registerBuild(BuildConfigurator::SM64_Build const& build) {
     QJsonObject builds = config["builds"].toObject();
     QJsonArray patches;
     for (QString patch : build.patches)
@@ -137,6 +139,14 @@ void registerBuild(BuildConfigurator::SM64_Build build) {
     };
     builds[build.name] = build_o;
     config["builds"] = builds;
+    LogManager::writeToLog("Added build \"" + build.name + "\"\n");
+}
+
+void removeBuildRef(QString const& name) {
+    QJsonObject builds = config["builds"].toObject();
+    builds.remove(name);
+    config["builds"] = builds;
+    LogManager::writeToLog("Removed build \"" + name + "\"\n");
 }
 
 void removeBuild(QWidget* parent, QString name) {
@@ -148,9 +158,40 @@ void removeBuild(QWidget* parent, QString name) {
             return;
         }
     }
-    QJsonObject builds = config["builds"].toObject();
-    builds.remove(name);
-    config["builds"] = builds;
+    removeBuildRef(name);
+}
+
+void renameBuild(QWidget* parent, BuildConfigurator::SM64_Build& build) {
+    QString new_name = QInputDialog::getText(parent, "Select new name", "Enter the new name for this build");
+    if (new_name.isEmpty()) {
+        QMessageBox::critical(parent, "Invalid Name", "Empty name given!");
+        return;
+    }
+    QString new_build_dir = config["builds"][build.name]["directory"].toString() + "/" + new_name;
+    QString old_build_dir = config["builds"][build.name]["directory"].toString() + "/" + build.name;
+    bool success = QDir(old_build_dir).rename(old_build_dir, new_build_dir);
+    if (!success) {
+        QMessageBox::critical(parent,"Rename failed", "Could not move build folder! Is the game still running?");
+        return;
+    }
+    QString old_name = build.name;
+    build.name = new_name;
+    removeBuildRef(old_name);
+    registerBuild(build);
+    LogManager::writeToLog("Renamed build \"" + old_name + "\" to \"" + build.name + "\"\n");
+}
+
+void moveBuild(QWidget* parent, BuildConfigurator::SM64_Build& build) {
+    QString new_parent_dir = QFileDialog::getExistingDirectory(parent, "Select new parent Directory");
+    QString old_build_dir = config["builds"][build.name]["directory"].toString() + "/" + build.name;
+    bool success = QDir(old_build_dir).rename(old_build_dir, new_parent_dir + "/" + build.name);
+    if (!success) {
+        QMessageBox::critical(parent,"Move failed", "Could not move build folder! Is the game still running?");
+        return;
+    }
+    build.directory = new_parent_dir;
+    registerBuild(build);
+    LogManager::writeToLog("Moved build \"" + build.name + "\" from \"" + old_build_dir + "\" to \"" + build.directory + "\"\n");
 }
 
 std::map<QString,BuildConfigurator::SM64_Build> getBuilds() {

@@ -7,6 +7,7 @@
 #include <memory>
 
 #include "BuildConfigurator.h"
+#include "BuildManager.h"
 #include "RequirementHandler.h"
 
 class MainWindow : public QMainWindow {
@@ -18,9 +19,10 @@ class MainWindow : public QMainWindow {
         using QMainWindow::QMainWindow;
         QPushButton play_build{"Play selected build",this};
         QCheckBox save_launch_opts{"Save launch options", this};
+        QPushButton manage_build{"Manage selected build", this};
         QPushButton create_default_build{"Compile default SM64AP build", this};
         QPushButton create_custom_build{"Compile custom build", this};
-        QPushButton recheck_requirements{"Re-check requirements", this};
+        QPushButton recheck_requirements{"Requirements and Debugging", this};
         QCheckBox use_advanced{"Show advanced options", this};
         QLabel build_list_label{"Playable builds:",this};
         QListWidget build_list{this};
@@ -31,6 +33,7 @@ class MainWindow : public QMainWindow {
         // Other
         std::unique_ptr<BuildConfigurator> configurator;
         std::unique_ptr<RequirementHandler> requirement_handler;
+        std::unique_ptr<BuildManager> build_manager;
         bool show_require_firstrun = false;
         BuildConfigurator::SM64_Build selected_build = {
             "_None"
@@ -42,8 +45,10 @@ class MainWindow : public QMainWindow {
         void startGame();
         void closeEvent(QCloseEvent *event);
         void showEvent(QShowEvent *event);
+        void changeEvent(QEvent *event);
         void spawnDefaultConfigurator();
         void spawnAdvancedConfigurator();
+        void spawnBuildManager();
         void spawnRequirementHandler();
         void buildSelectionHandler(QListWidgetItem *current, QListWidgetItem *previous);
 };

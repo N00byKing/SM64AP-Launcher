@@ -15,6 +15,8 @@ class RequirementHandler : public QWidget {
     public:
         static constexpr int window_w = 480;
         static constexpr int window_h = 550;
+        static constexpr std::string_view US_ROM_HASH = "9bef1128717f958171a4afac3ed78ee2bb4e86ce";
+        static constexpr std::string_view JP_ROM_HASH = "8a20a5c83d6ceb0f0506cfc9fa20d8f438cafe51";
         RequirementHandler(QWidget* parent, bool advanced);
         RequirementHandler() = delete;
     private:
