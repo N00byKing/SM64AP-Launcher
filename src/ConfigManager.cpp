@@ -150,10 +150,10 @@ void removeBuildRef(QString const& name) {
 }
 
 void removeBuild(QWidget* parent, QString name) {
-    QMessageBox::StandardButton answer = QMessageBox::question(parent, "Delete Build", "Do you want to DELETE (not just remove the config entry!) this build?");
+    QDir build_folder = config["builds"][name]["directory"].toString() + "/" + name;
+    QMessageBox::StandardButton answer = QMessageBox::question(parent, "Delete Build", "Do you want to DELETE (not just remove the config entry!) this build?\nThe following directory will be deleted:\n" + build_folder.absolutePath());
     if (answer == QMessageBox::StandardButton::Yes) {
-        QDir build = config["builds"][name]["directory"].toString() + "/" + name;
-        if (!build.removeRecursively()) {
+        if (!build_folder.removeRecursively()) {
             QMessageBox::critical(parent,"Deletion failed", "Could not delete build folder! Is the game still running?");
             return;
         }
