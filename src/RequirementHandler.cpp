@@ -18,6 +18,7 @@ RequirementHandler::RequirementHandler(QWidget* parent, bool padvanced) : QWidge
     // Load config
     #ifdef WIN32
     msys_select.setText(Config::getMSYSPath());
+    msys_select.setToolTip("Can be changed if advanced options set in main screen. This may break things!");
     #endif
 
     // Init default
