@@ -114,6 +114,11 @@ QString getROMPath(BuildConfigurator::SM64_Region region) {
     }
 }
 
+bool hasRomRegistered() {
+    return getROMPath(BuildConfigurator::SM64_Region::JP) != "_None" ||
+           getROMPath(BuildConfigurator::SM64_Region::US) != "_None";
+}
+
 void setBuildHome(QString path) {
     config["default_build_root"] = path;
 }

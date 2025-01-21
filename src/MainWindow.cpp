@@ -93,6 +93,10 @@ void MainWindow::spawnBuildManager() {
 }
 
 void MainWindow::spawnDefaultConfigurator() {
+    if (!Config::hasRomRegistered()) {
+        QMessageBox::information(this, "No ROM registered", "You need to register a ROM first.\nIn the main screen, click 'Requirements and Debugging', then 'Register SM64 ROM'");
+        return;
+    }
     configurator = std::make_unique<BuildConfigurator>(this,false);
     this->setEnabled(false);
     configurator->setEnabled(true);
@@ -100,6 +104,10 @@ void MainWindow::spawnDefaultConfigurator() {
 }
 
 void MainWindow::spawnAdvancedConfigurator() {
+    if (!Config::hasRomRegistered()) {
+        QMessageBox::information(this, "No ROM registered", "You need to register a ROM first.\nIn the main screen, click 'Requirements and Debugging', then 'Register SM64 ROM'");
+        return;
+    }
     configurator = std::make_unique<BuildConfigurator>(this,true);
     this->setEnabled(false);
     configurator->setEnabled(true);

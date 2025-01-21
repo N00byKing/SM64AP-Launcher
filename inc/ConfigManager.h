@@ -25,6 +25,7 @@ namespace Config {
     QString getMSYSPath();
     void setROMPath(QString,BuildConfigurator::SM64_Region);
     QString getROMPath(BuildConfigurator::SM64_Region);
+    bool hasRomRegistered();
     void setBuildHome(QString);
     QString getBuildHome();
     bool isFirstRun();
