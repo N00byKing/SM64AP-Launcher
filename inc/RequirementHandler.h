@@ -35,13 +35,13 @@ class RequirementHandler : public QWidget {
         bool advanced = false;
         std::vector<QString> dependencies = {
             "unzip",
-            "mingw-w64-x86_64-gcc",
-            "mingw-w64-x86_64-glew",
-            "mingw-w64-x86_64-SDL2",
+            "mingw-w64-ucrt-x86_64-gcc",
+            "mingw-w64-ucrt-x86_64-glew",
+            "mingw-w64-ucrt-x86_64-SDL2",
             "git",
             "make",
             "python3",
-            "mingw-w64-x86_64-cmake"
+            "mingw-w64-ucrt-x86_64-cmake"
         };
         void closeEvent(QCloseEvent *event);
         #ifdef WIN32
