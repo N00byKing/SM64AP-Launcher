@@ -77,8 +77,14 @@ void MainWindow::parseBuilds() {
     for (std::pair<QString,BuildConfigurator::SM64_Build> build : builds) {
         build_list.addItem(build.first);
     }
-    if (build_list.count() == 0)
+    if (build_list.count() == 0) {
         build_list.addItem("No builds!\nCreate a new one.");
+        selected_build_info.clear();
+        launch_options.clear();
+        play_build.setEnabled(false);
+        manage_build.setEnabled(false);
+        launch_options.setEnabled(false);
+    }
 }
 
 void MainWindow::spawnBuildManager() {
