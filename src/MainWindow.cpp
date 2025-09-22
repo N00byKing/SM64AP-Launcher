@@ -79,7 +79,7 @@ void MainWindow::parseBuilds() {
     }
     if (build_list.count() == 0) {
         build_list.addItem("No builds!\nCreate a new one.");
-        selected_build_info.clear();
+        selected_build_info.setPlainText("No build selected");
         launch_options.clear();
         play_build.setEnabled(false);
         manage_build.setEnabled(false);
