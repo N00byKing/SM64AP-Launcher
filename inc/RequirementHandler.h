@@ -24,7 +24,6 @@ class RequirementHandler : public QWidget {
         #ifdef WIN32
         QLineEdit msys_select{Config::default_msys_path,this};
         QLabel msys_select_label{"Path to MSYS installation",this};
-        QPushButton reinstall_msys{"Re-install MSYS",this};
         QPushButton reinstall_dependencies{"Re-install Dependencies",this};
         #endif
         QPushButton check_requirements{"Check requirements",this};
@@ -53,7 +52,6 @@ class RequirementHandler : public QWidget {
         void setLocations();
         void setAdvanced(bool);
         BuildConfigurator::SM64_Region identifyROM(QString);
-        void reinstallMSYS();
         void reinstallDependencies();
         void updateMSYSCallback(int);
         void installDependencyCallback(int);

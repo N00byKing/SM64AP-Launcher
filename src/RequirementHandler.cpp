@@ -34,7 +34,6 @@ RequirementHandler::RequirementHandler(QWidget* parent, bool padvanced) : QWidge
     QObject::connect(&rewrite_config, &QPushButton::released, this, &Config::writeConfig);
     #ifdef WIN32
     QObject::connect(&check_requirements, &QPushButton::released, this, &RequirementHandler::checkRequirementsMSYS);
-    QObject::connect(&reinstall_msys, &QPushButton::released, this, &RequirementHandler::reinstallMSYS);
     QObject::connect(&reinstall_dependencies, &QPushButton::released, this, &RequirementHandler::reinstallDependencies);
     #else
     QObject::connect(&check_requirements, &QPushButton::released, this, &RequirementHandler::checkRequirementsROM);
@@ -46,7 +45,6 @@ void RequirementHandler::setLocations() {
     #ifdef WIN32
     msys_select.setGeometry(30,30,250,30);
     msys_select_label.setGeometry(300,30,180,30);
-    reinstall_msys.setGeometry(30,230,250,30);
     reinstall_dependencies.setGeometry(30,270,250,30);
     #endif
     select_rom.setGeometry(30,70,250,30);
@@ -59,7 +57,6 @@ void RequirementHandler::setLocations() {
 void RequirementHandler::setAdvanced(bool enabled) {
     #ifdef WIN32
     msys_select.setEnabled(enabled);
-    reinstall_msys.setEnabled(enabled);
     reinstall_dependencies.setEnabled(enabled);
     #endif
 }
@@ -75,10 +72,7 @@ void RequirementHandler::checkRequirementsMSYS() {
         return;
     }
     if (!QFile::exists(msys_dir + "/usr/bin/bash.exe")) {
-        QMessageBox::StandardButton answer = QMessageBox::question(this, "MSYS not installed or corrupted", "MSYS was not found at the specified location. Attempt reinstall? This will install MSYS at the default location.");
-        if (answer == QMessageBox::StandardButton::Yes) {
-            reinstallMSYS();
-        }
+        QMessageBox::critical(this, "MSYS not installed or corrupted", "MSYS was not found at the specified location.");
         enableInput(true);
         return;
     }
@@ -191,12 +185,6 @@ BuildConfigurator::SM64_Region RequirementHandler::identifyROM(QString rom_file_
 void RequirementHandler::closeEvent(QCloseEvent *event) {
     parentWidget()->setEnabled(true);
     // No need to delete now. MainWindow will, either on close or on regen
-}
-
-void RequirementHandler::reinstallMSYS() {
-    QMessageBox::critical(this, "TODO", "Currently not implemented, do it yourself :)");
-    return;
-    LogManager::writeToLog("Reinstalling MSYS...");
 }
 
 void RequirementHandler::reinstallDependencies() {
