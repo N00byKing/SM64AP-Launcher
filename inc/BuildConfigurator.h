@@ -31,8 +31,7 @@ class BuildConfigurator : public QWidget {
             QString default_launch_opts =
                 "--sm64ap_name \"NAME\"\n"
                 "--sm64ap_ip archipelago.gg:PORT\n"
-                "--sm64ap_passwd \"None\"\n"
-                "--skip-intro";
+                "--sm64ap_passwd \"None\"";
         };
         void printToUser(QString str);
     private:
