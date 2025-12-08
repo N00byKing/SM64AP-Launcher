@@ -28,7 +28,10 @@ class BuildConfigurator : public QWidget {
             SM64_Region region;
             QString make_flags;
             QStringList patches;
-            QString default_launch_opts = "--sm64ap_name NAME\n--sm64ap_ip archipelago.gg:PORT";
+            QString default_launch_opts =
+                "--sm64ap_name \"NAME\"\n"
+                "--sm64ap_ip archipelago.gg:PORT\n"
+                "--sm64ap_passwd \"None\"";
         };
         void printToUser(QString str);
     private:
