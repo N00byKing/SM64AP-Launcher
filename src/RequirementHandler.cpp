@@ -1,12 +1,12 @@
 #include "RequirementHandler.h"
 
-#include <QWidget>
-#include <QObject>
-#include <QPushButton>
-#include <QDir>
-#include <QMessageBox>
-#include <QCryptographicHash>
-#include <QFileDialog>
+#include <QtWidgets/QWidget>
+#include <QtCore/QObject>
+#include <QtWidgets/QPushButton>
+#include <QtCore/QDir>
+#include <QtWidgets/QMessageBox>
+#include <QtCore/QCryptographicHash>
+#include <QtWidgets/QFileDialog>
 #include <functional>
 
 #include "ConfigManager.h"

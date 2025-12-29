@@ -1,12 +1,12 @@
 #include "BuildManager.h"
 
-#include <QWidget>
-#include <QObject>
-#include <QPushButton>
-#include <QDir>
-#include <QMessageBox>
-#include <QFileDialog>
-#include <QMessageBox>
+#include <QtWidgets/QWidget>
+#include <QtCore/QObject>
+#include <QtWidgets/QPushButton>
+#include <QtCore/QDir>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QMessageBox>
 
 #include "BuildConfigurator.h"
 #include "ConfigManager.h"

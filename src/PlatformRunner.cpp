@@ -1,11 +1,10 @@
 #include "PlatformRunner.h"
 
-#include <QProcess>
-#include <QDir>
-#include <QStringList>
-#include <QObject>
-#include <QCoreApplication>
-
+#include <QtCore/QProcess>
+#include <QtCore/QDir>
+#include <QtCore/QStringList>
+#include <QtCore/QObject>
+#include <QtCore/QCoreApplication>
 #include <functional>
 #include <string>
 
