@@ -24,8 +24,6 @@ qt_add_executable(SM64APLauncher
     src/OutputWidget.cpp
 )
 
-target_compile_features(SM64APLauncher PRIVATE cxx_std_17)
-
 # Linking
 target_link_libraries(SM64APLauncher PUBLIC Qt6::Core Qt6::Widgets)
 target_include_directories(SM64APLauncher PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/inc)
