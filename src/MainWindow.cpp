@@ -1,15 +1,15 @@
 #include "MainWindow.h"
 
-#include <QApplication>
-#include <QPushButton>
-#include <QCheckBox>
-#include <QShowEvent>
-#include <QWidget>
-#include <QListWidget>
-#include <QMessageBox>
-#include <QFile>
-#include <QObject>
-#include <QFileInfo>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QCheckBox>
+#include <QtGui/QShowEvent>
+#include <QtWidgets/QWidget>
+#include <QtWidgets/QListWidget>
+#include <QtWidgets/QMessageBox>
+#include <QtCore/QFile>
+#include <QtCore/QObject>
+#include <QtCore/QFileInfo>
 #include <memory>
 #include <map>
 
