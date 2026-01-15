@@ -83,3 +83,27 @@ jobs:
         name: SM64AP-Launcher_linux
         path: |
           build/SM64AP_Launcher-x86_64.AppImage
+  
+  build-mac:
+    name: Build (macOS)
+    
+    runs-on: macos-26
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.6.*'
+        cache: 'true'
+    - name: CMake configure
+      run: |
+        mkdir build
+        cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Release
+    - name: Build
+      run: |
+        cd build
+        cmake --build .
