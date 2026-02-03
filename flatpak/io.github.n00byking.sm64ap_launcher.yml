@@ -1,0 +1,97 @@
+id: io.github.n00byking.sm64ap_launcher
+runtime: org.kde.Platform
+runtime-version: '6.10'
+sdk: org.kde.Sdk
+command: launcher_wrapper
+finish-args:
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --filesystem=home
+  - --share=network
+  - --talk-name=org.freedesktop.Flatpak
+  - --device=input
+modules:
+  - name: git
+    buildsystem: autotools
+    build-options:
+      cflags: "-g0 -O3" # Avoid taking forever to compress debug info
+    sources:
+      - type: archive
+        url: https://www.kernel.org/pub/software/scm/git/git-2.52.0.tar.gz
+        sha256: 6880cb1e737e26f81cf7db9957ab2b5bb2aa1490d87619480b860816e0c10c32
+  - name: make
+    buildsystem: autotools
+    sources:
+      - type: archive
+        url: https://ftp.gnu.org/gnu/make/make-4.4.1.tar.gz
+        sha256: dd16fb1d67bfab79a72f5e8390735c49e3e8e70b4945a15ab1f81ddb78658fb3
+  - name: cmake
+    buildsystem: simple
+    build-commands:
+      - chmod +x cmake-4.2.3-linux-x86_64.sh && ./cmake-4.2.3-linux-x86_64.sh --skip-license --prefix=/app
+    sources:
+      - type: file
+        url: https://github.com/Kitware/CMake/releases/download/v4.2.3/cmake-4.2.3-linux-x86_64.sh
+        sha256: b760514fde7fc510fcd16e51a81a4d2687b1f051b263d40b6806789d3d9fd62c
+  - name: openssl
+    buildsystem: simple
+    build-commands:
+      - ./Configure --prefix=/app --libdir=/app/lib --openssldir=/etc/pki/tls
+      - make -j1 depend
+      - make -j8
+      - make install_sw
+    sources:
+      - type: archive
+        url: https://github.com/openssl/openssl/releases/download/openssl-3.6.1/openssl-3.6.1.tar.gz
+        sha256: b1bfedcd5b289ff22aee87c9d600f515767ebf45f77168cb6d64f231f518a82e
+  - name: SM64AP-Launcher
+    buildsystem: cmake
+    sources:
+      - type: git
+        url: https://github.com/N00byKing/SM64AP-Launcher
+        tag: rel7
+  - name: sdl2-config
+    buildsystem: simple
+    build-commands:
+      - install -Dm755 /usr/bin/sdl2-config /app/bin/sdl2-config
+  - name: shell-wrappers
+    buildsystem: simple
+    build-commands:
+      - install -Dm755 launcher_wrapper.sh /app/bin/launcher_wrapper
+      - install -Dm755 gcc.sh /app/bin/gcc
+      - install -Dm755 g++.sh /app/bin/g++
+      - install -Dm755 cpp.sh /app/bin/cpp
+      - install -Dm755 ar.sh /app/bin/ar
+      - install -Dm755 as.sh /app/bin/as
+      - install -Dm755 objcopy.sh /app/bin/objcopy
+    sources:
+      - type: script
+        dest-filename: launcher_wrapper.sh
+        commands:
+          - export CC=gcc
+          - export CXX=g++
+          - SM64APLauncher
+      - type: script
+        dest-filename: gcc.sh
+        commands:
+          - "flatpak-spawn --host gcc $@"
+      - type: script
+        dest-filename: g++.sh
+        commands:
+          - "flatpak-spawn --host g++ $@"
+      - type: script
+        dest-filename: ar.sh
+        commands:
+          - "flatpak-spawn --host ar $@"
+      - type: script
+        dest-filename: as.sh
+        commands:
+          - "flatpak-spawn --host as $@"
+      - type: script
+        dest-filename: cpp.sh
+        commands:
+          - "flatpak-spawn --host cpp $@"
+      - type: script
+        dest-filename: objcopy.sh
+        commands:
+          - "flatpak-spawn --host objcopy $@"

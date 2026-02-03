@@ -112,6 +112,7 @@ void BuildConfigurator::confirmAndDownloadRepo() {
         QMessageBox::StandardButton answer = QMessageBox::question(this, "Existing Build Name", "An existing build already has this name. Do you want to remove its entry?");
         if (answer == QMessageBox::StandardButton::Yes) {
             Config::removeBuild(this, active_build.name);
+            Config::writeConfig();
         }
         return;
     }

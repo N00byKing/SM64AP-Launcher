@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.n00byking.sm64ap_launcher</id>
+  
+  <name>SM64AP-Launcher</name>
+  <summary>Build and Manage SM64 PC Port Instances</summary>
+  
+  <metadata_license>FSFAP</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  
+  <description>
+    <p>
+      A launcher specialising in the Archipelago build of sm64ex, but capable of building most sm64 PC ports.
+    </p>
+  </description>
+  
+  <launchable type="desktop-id">io.github.n00byking.sm64ap_launcher.desktop</launchable>
+</component>

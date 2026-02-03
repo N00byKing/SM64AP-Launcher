@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+
+Name=SM64AP-Launcher
+Comment=Build and Manage SM64 PC Port Instances
+Categories=Game;Qt;
+
+Icon=sm64ap-launcher
+Exec=SM64APLauncher
+Terminal=false
