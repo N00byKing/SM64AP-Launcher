@@ -8,10 +8,12 @@ command: launcher_wrapper
 finish-args:
   - --socket=wayland
   - --socket=fallback-x11
+  - --socket=pulseaudio
   - --filesystem=home
   - --share=network
   - --talk-name=org.freedesktop.Flatpak
   - --device=input
+  - --device=dri
 modules:
   - name: git
     buildsystem: autotools
@@ -100,16 +102,13 @@ modules:
       - find /usr -name 'librt.so*' -type f -exec cp --parents -a {} /app/sysroot \;
       - find /usr -name 'libgcc_s.so*' -type f -exec cp --parents -a {} /app/sysroot \;
       - find /usr -name 'libstdc++.so*' -type f -exec cp --parents -a {} /app/sysroot \;
-      - find /usr -name 'libstdc++.so*' -type f -exec cp -a {} /app/sysroot/usr/lib \;
       - find /usr -name 'libGL.so*' -type f -exec cp --parents -a {} /app/sysroot \;
-      - find /usr -name 'libGL.so*' -type f -exec cp -a {} /app/sysroot/usr/lib \;
-      - find /usr -name 'libpthread.so*' -type f -exec cp -a {} /app/sysroot/usr/lib \;
-      - find /usr -name 'libdl.so*' -type f -exec cp -a {} /app/sysroot/usr/lib \;
       - |
         for lib in libstdc++ libGL libpthread libdl; do
           cand=$(ls -1 /app/sysroot/usr/lib/x86_64-linux-gnu/${lib}.so.* /app/sysroot/usr/lib/${lib}.so.* 2>/dev/null | head -n 1)
           if [ -n "$cand" ]; then
-            ln -sf "$(basename "$cand")" "/app/sysroot/usr/lib/${lib}.so"
+            dir=$(dirname "$cand")
+            ln -sf "$(basename "$cand")" "$dir/${lib}.so"
           fi
         done
       - find /usr -name 'libc_nonshared.a' -type f -exec cp --parents -a {} /app/sysroot \;
@@ -137,10 +136,10 @@ modules:
       - install -Dm755 launcher_wrapper.sh /app/bin/launcher_wrapper
       - install -Dm755 clang.sh /app/bin/clang
       - install -Dm755 clang++.sh /app/bin/clang++
-      - install -Dm755 lld.sh /app/bin/lld
-      - install -Dm755 cpp.sh /app/bin/cpp
-      - install -Dm755 ar.sh /app/bin/ar
-      - install -Dm755 objcopy.sh /app/bin/objcopy
+      - ln -sf /app/llvm/bin/lld /app/bin/lld
+      - ln -sf /app/llvm/bin/clang-cpp /app/bin/cpp
+      - ln -sf /app/llvm/bin/llvm-ar /app/bin/ar
+      - ln -sf /app/llvm/bin/llvm-objcopy /app/bin/objcopy
     sources:
       - type: script
         dest-filename: launcher_wrapper.sh
@@ -197,19 +196,3 @@ modules:
             else
               eval exec /app/llvm/bin/clang++ --sysroot=/app/sysroot --gcc-toolchain=/app/sysroot/usr -idirafter /app/sysroot/usr/include -idirafter /app/sysroot/usr/include/x86_64-linux-gnu $args
             fi
-      - type: script
-        dest-filename: ar.sh
-        commands:
-          - /app/llvm/bin/llvm-ar "$@"
-      - type: script
-        dest-filename: lld.sh
-        commands:
-          - /app/llvm/bin/lld "$@"
-      - type: script
-        dest-filename: cpp.sh
-        commands:
-          - /app/llvm/bin/clang-cpp "$@"
-      - type: script
-        dest-filename: objcopy.sh
-        commands:
-          - /app/llvm/bin/llvm-objcopy "$@"
