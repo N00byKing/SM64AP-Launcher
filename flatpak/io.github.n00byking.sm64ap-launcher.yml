@@ -1,4 +1,4 @@
-id: io.github.n00byking.sm64ap_launcher
+id: io.github.n00byking.sm64ap-launcher
 runtime: org.kde.Platform
 runtime-version: '6.10'
 sdk: org.kde.Sdk
@@ -11,7 +11,6 @@ finish-args:
   - --socket=pulseaudio
   - --filesystem=home
   - --share=network
-  - --talk-name=org.freedesktop.Flatpak
   - --device=input
   - --device=dri
 modules:
