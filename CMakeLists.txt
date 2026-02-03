@@ -31,5 +31,8 @@ set_target_properties(SM64APLauncher PROPERTIES
     WIN32_EXECUTABLE ON
 )
 
+configure_file(res/metainfo.xml ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
+configure_file(res/SM64APLauncher.desktop ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
+
 install(TARGETS SM64APLauncher)
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/presets TYPE BIN USE_SOURCE_PERMISSIONS)

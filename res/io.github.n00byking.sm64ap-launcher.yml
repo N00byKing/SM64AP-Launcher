@@ -76,7 +76,7 @@ modules:
       - type: archive
         url: https://www.libsdl.org/release/sdl2-compat-2.32.62.tar.gz
         sha256: 23019a3b0825e2fd3411901df3e1ae24c595cd57e20a345509f77472bd9000e0
-  - name: llvm-sdk
+  - name: llvm
     buildsystem: simple
     build-commands:
       - mkdir -p /app/llvm
@@ -127,10 +127,14 @@ modules:
       - if [ -f /app/lib/libsframe.so.2.0.0 ]; then ln -sf libsframe.so.2.0.0 /app/lib/libsframe.so.2; fi
   - name: SM64AP-Launcher
     buildsystem: cmake
+    post-install:
+      - ls .. && pwd
+      - install -Dm644 ${FLATPAK_BUILDER_BUILDDIR}/res/metainfo.xml /app/share/metainfo/${FLATPAK_ID}.metainfo.xml
+      - install -Dm644 ${FLATPAK_BUILDER_BUILDDIR}/res/icon.png /app/share/icons/hicolor/512x512/apps/${FLATPAK_ID}.png
     sources:
       - type: git
         url: https://github.com/N00byKing/SM64AP-Launcher
-        tag: rel7
+        branch: flatpaktest
   - name: shell-wrappers
     buildsystem: simple
     build-commands:
