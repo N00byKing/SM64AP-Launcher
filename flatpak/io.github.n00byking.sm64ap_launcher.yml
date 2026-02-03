@@ -82,6 +82,8 @@ modules:
     build-commands:
       - mkdir -p /app/llvm
       - cp -a /usr/lib/sdk/llvm21/. /app/llvm
+      - find /app/llvm/bin -type f -exec /usr/bin/strip --strip-unneeded {} + || true
+      - find /app/llvm/lib -type f -name '*.so*' -exec /usr/bin/strip --strip-unneeded {} + || true
   - name: sdk-sysroot
     buildsystem: simple
     build-commands:
