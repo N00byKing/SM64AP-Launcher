@@ -4,6 +4,7 @@
   
   <name>SM64AP-Launcher</name>
   <summary>Build and Manage SM64 PC Port Instances</summary>
+  <icon type="stock">io.github.n00byking.sm64ap-launcher</icon>
 
   <url type="vcs-browser">https://github.com/N00byKing/SM64AP-Launcher</url>
   <url type="homepage">https://github.com/N00byKing/SM64AP-Launcher</url>
@@ -37,5 +38,5 @@
     </release>
   </releases>
   
-  <launchable type="desktop-id">io.github.n00byking.sm64ap_launcher.desktop</launchable>
+  <launchable type="desktop-id">io.github.n00byking.sm64ap-launcher.desktop</launchable>
 </component>
