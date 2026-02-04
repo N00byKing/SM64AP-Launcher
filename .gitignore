@@ -3,3 +3,4 @@ build/
 install/
 compile_commands.json
 inc/version.h
+res/export*
