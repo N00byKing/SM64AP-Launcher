@@ -4,8 +4,10 @@
 FULL_BUILD_PATH="${BUILD_TARGET_DIR}/${BUILD_NAME}"
 
 # Force MSYS2 compilers
-export CC=/mingw64/bin/gcc
-export CXX=/mingw64/bin/g++
+if [[ "${IS_FLATPAK}" != "1" ]]; then
+    export CC=/mingw64/bin/gcc
+    export CXX=/mingw64/bin/g++
+fi
 
 cp  "${BUILD_ROM}" "${FULL_BUILD_PATH}/baserom.${BUILD_REGION}.z64"
 cd "${FULL_BUILD_PATH}"
