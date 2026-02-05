@@ -76,7 +76,7 @@ jobs:
     - name: Create AppImage
       run: |
         cd build
-        linuxdeploy-x86_64.AppImage --plugin qt --appdir AppDir --desktop-file=../res/SM64APLauncher.desktop --icon-file=../res/icon.png --output appimage
+        linuxdeploy-x86_64.AppImage --plugin qt --appdir AppDir --desktop-file=../res/SM64APLauncher.desktop --icon-file=../res/io.github.n00byking.sm64ap-launcher.png --output appimage
     - name: Create Build Artifact
       uses: actions/upload-artifact@v4
       with:

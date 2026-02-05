@@ -8,6 +8,7 @@
 #include <QCryptographicHash>
 #include <QFileDialog>
 #include <functional>
+#include <QtEnvironmentVariables>
 
 #include "ConfigManager.h"
 #include "LogManager.h"
@@ -119,7 +120,9 @@ void RequirementHandler::checkRequirementsROM() {
     #ifdef WIN32
     QMessageBox::information(this, "No issues found", "There seem to be no issues with your installation.");
     #else
-    QMessageBox::information(this, "No issues found", "There seem to be no issues with your installation.\nHowever, dependencies are not checked on linux.");
+    QString text = "There seem to be no issues with your installation.";
+    if (qgetenv("IS_FLATPAK") != "1") text += "\nHowever, dependencies are not checked on (non-Flatpak) linux installations.";
+    QMessageBox::information(this, "No issues found", text);
     #endif
     enableInput(true);
 }

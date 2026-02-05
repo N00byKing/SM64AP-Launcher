@@ -67,9 +67,9 @@ QProcessEnvironment __setup_env(BuildConfigurator::SM64_Build* build) {
     #ifdef WIN32
     env.remove("PYTHONPATH");
     env.remove("PYTHONHOME");
+    env.insert("MSYSTEM", "MINGW64");
     #endif
     if (build == nullptr) return env;
-    env.insert("MSYSTEM", "MINGW64");
     env.insert("CHERE_INVOKING", "yes");
     env.insert("BUILD_NAME", build->name);
     env.insert("BUILD_TARGET_DIR", build->directory);

@@ -1,0 +1,207 @@
+id: io.github.n00byking.sm64ap-launcher
+runtime: org.kde.Platform
+runtime-version: '6.10'
+sdk: org.kde.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.llvm21
+command: launcher_wrapper
+finish-args:
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --socket=pulseaudio
+  - --filesystem=home
+  - --share=network
+# Annoyingly needed for older flatpak releases
+  - --device=all
+# Using below would be cleaner, but want to keep compat with Ubuntu LTS (noble, until May 2029)
+#  - --device=input
+#  - --device=dri
+modules:
+  - name: git
+    buildsystem: autotools
+    build-options:
+      cflags: "-g0 -O3" # Avoid taking forever to compress debug info
+    sources:
+      - type: archive
+        url: https://www.kernel.org/pub/software/scm/git/git-2.52.0.tar.gz
+        sha256: 6880cb1e737e26f81cf7db9957ab2b5bb2aa1490d87619480b860816e0c10c32
+  - name: make
+    buildsystem: autotools
+    sources:
+      - type: archive
+        url: https://ftp.gnu.org/gnu/make/make-4.4.1.tar.gz
+        sha256: dd16fb1d67bfab79a72f5e8390735c49e3e8e70b4945a15ab1f81ddb78658fb3
+  - name: cmake
+    buildsystem: simple
+    build-commands:
+      - chmod +x cmake-4.2.3-linux-x86_64.sh && ./cmake-4.2.3-linux-x86_64.sh --skip-license --prefix=/app
+    sources:
+      - type: file
+        url: https://github.com/Kitware/CMake/releases/download/v4.2.3/cmake-4.2.3-linux-x86_64.sh
+        sha256: b760514fde7fc510fcd16e51a81a4d2687b1f051b263d40b6806789d3d9fd62c
+  - name: openssl
+    buildsystem: simple
+    build-commands:
+      - ./Configure --prefix=/app --libdir=/app/lib --openssldir=/etc/pki/tls
+      - make -j1 depend
+      - make -j8
+      - make install_sw
+    sources:
+      - type: archive
+        url: https://github.com/openssl/openssl/releases/download/openssl-3.6.1/openssl-3.6.1.tar.gz
+        sha256: b1bfedcd5b289ff22aee87c9d600f515767ebf45f77168cb6d64f231f518a82e
+  - name: SDL3
+    buildsystem: cmake
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DCMAKE_INSTALL_PREFIX=/app
+      - -DSDL_SHARED=ON
+      - -DSDL_STATIC=OFF
+      - -DSDL_TEST_LIBRARY=OFF
+      - -DSDL_TESTS=OFF
+      - -DSDL_INSTALL_TESTS=OFF
+      - -DSDL_DISABLE_INSTALL_DOCS=ON
+    sources:
+      - type: archive
+        url: https://www.libsdl.org/release/SDL3-3.4.0.tar.gz
+        sha256: 082cbf5f429e0d80820f68dc2b507a94d4cc1b4e70817b119bbb8ec6a69584b8
+  - name: sdl2-compat
+    buildsystem: cmake
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DCMAKE_INSTALL_PREFIX=/app
+      - -DCMAKE_SKIP_INSTALL_RPATH=ON
+      - -DSDL2COMPAT_STATIC=OFF
+      - -DSDL2COMPAT_TESTS=OFF
+      - -DSDL2COMPAT_INSTALL_TESTS=OFF
+      - -DSDL3_INCLUDE_DIRS=/app/include/SDL3
+    sources:
+      - type: archive
+        url: https://www.libsdl.org/release/sdl2-compat-2.32.62.tar.gz
+        sha256: 23019a3b0825e2fd3411901df3e1ae24c595cd57e20a345509f77472bd9000e0
+  - name: llvm
+    buildsystem: simple
+    build-commands:
+      - mkdir -p /app/llvm
+      - cp -a /usr/lib/sdk/llvm21/. /app/llvm
+      - find /app/llvm/bin -type f -exec /usr/bin/strip --strip-unneeded {} + || true
+      - find /app/llvm/lib -type f -name '*.so*' -exec /usr/bin/strip --strip-unneeded {} + || true
+  - name: sdk-sysroot
+    buildsystem: simple
+    build-commands:
+      - rm -rf /app/sysroot
+      - mkdir -p /app/sysroot
+      - mkdir -p /app/sysroot/usr/include
+      - cp -a /usr/include/. /app/sysroot/usr/include
+      - if [ -d /usr/include/x86_64-linux-gnu ]; then rm -f /app/sysroot/usr/include/x86_64-linux-gnu; cp -aL /usr/include/x86_64-linux-gnu /app/sysroot/usr/include/; fi
+      - if [ -d /usr/lib/x86_64-linux-gnu/include ]; then mkdir -p /app/sysroot/usr/lib/x86_64-linux-gnu && cp -a /usr/lib/x86_64-linux-gnu/include /app/sysroot/usr/lib/x86_64-linux-gnu/; fi
+      - if [ -d /usr/include/bits ]; then cp -a /usr/include/bits /app/sysroot/usr/include/; fi
+      - find /usr -name 'Scrt1.o' -type f -exec cp --parents -a {} /app/sysroot \;
+      - find /usr -name 'crt*.o' -type f -exec cp --parents -a {} /app/sysroot \;
+      - find /usr -name 'libc.so*' -type f -exec cp --parents -a {} /app/sysroot \;
+      - find /usr -name 'libm.so*' -type f -exec cp --parents -a {} /app/sysroot \;
+      - find /usr -name 'libmvec.so*' -type f -exec cp --parents -a {} /app/sysroot \;
+      - find /usr -name 'libpthread.so*' -type f -exec cp --parents -a {} /app/sysroot \;
+      - find /usr -name 'libdl.so*' -type f -exec cp --parents -a {} /app/sysroot \;
+      - find /usr -name 'librt.so*' -type f -exec cp --parents -a {} /app/sysroot \;
+      - find /usr -name 'libgcc_s.so*' -type f -exec cp --parents -a {} /app/sysroot \;
+      - find /usr -name 'libstdc++.so*' -type f -exec cp --parents -a {} /app/sysroot \;
+      - find /usr -name 'libGL.so*' -type f -exec cp --parents -a {} /app/sysroot \;
+      - |
+        for lib in libstdc++ libGL libpthread libdl; do
+          cand=$(ls -1 /app/sysroot/usr/lib/x86_64-linux-gnu/${lib}.so.* /app/sysroot/usr/lib/${lib}.so.* 2>/dev/null | head -n 1)
+          if [ -n "$cand" ]; then
+            dir=$(dirname "$cand")
+            ln -sf "$(basename "$cand")" "$dir/${lib}.so"
+          fi
+        done
+      - find /usr -name 'libc_nonshared.a' -type f -exec cp --parents -a {} /app/sysroot \;
+      - find /lib /lib64 /usr/lib /usr/lib64 -name 'ld-linux-x86-64.so.2' -type f -exec cp --parents -a {} /app/sysroot \;
+      - mkdir -p /app/sysroot/lib /app/sysroot/lib64
+      - LD_LINUX=$(find /lib /lib64 /usr/lib /usr/lib64 -name 'ld-linux-x86-64.so.2' -type f | head -n 1) && [ -n "$LD_LINUX" ] && install -Dm755 "$LD_LINUX" /app/sysroot/lib64/ld-linux-x86-64.so.2
+      - find /usr -path '/usr/lib/gcc/*' -type f -exec cp --parents -a {} /app/sysroot \;
+  - name: sdk-as
+    buildsystem: simple
+    build-commands:
+      - install -Dm755 /usr/bin/as /app/bin/as
+      - mkdir -p /app/lib
+      - find /usr/lib /usr/lib64 -name 'libbfd*.so*' -type f -exec install -Dm755 {} /app/lib/ \;
+      - find /usr/lib /usr/lib64 -name 'libsframe.so*' -type f -exec install -Dm755 {} /app/lib/ \;
+      - if [ -f /app/lib/libsframe.so.2.0.0 ]; then ln -sf libsframe.so.2.0.0 /app/lib/libsframe.so.2; fi
+  - name: SM64AP-Launcher
+    buildsystem: cmake
+    post-install:
+      - install -Dm644 ${FLATPAK_BUILDER_BUILDDIR}/res/metainfo.xml /app/share/metainfo/${FLATPAK_ID}.metainfo.xml
+      - install -Dm644 ${FLATPAK_BUILDER_BUILDDIR}/res/SM64APLauncher.desktop /app/share/applications/${FLATPAK_ID}.desktop
+      - desktop-file-edit --set-key=Exec --set-value=launcher_wrapper /app/share/applications/${FLATPAK_ID}.desktop
+      - install -Dm644 ${FLATPAK_BUILDER_BUILDDIR}/res/icon.png /app/share/icons/hicolor/512x512/apps/${FLATPAK_ID}.png
+    sources:
+      - type: git
+        url: https://github.com/N00byKing/SM64AP-Launcher
+        branch: flatpaktest
+  - name: shell-wrappers
+    buildsystem: simple
+    build-commands:
+      - install -Dm755 launcher_wrapper.sh /app/bin/launcher_wrapper
+      - install -Dm755 clang.sh /app/bin/clang
+      - install -Dm755 clang++.sh /app/bin/clang++
+      - ln -sf /app/llvm/bin/lld /app/bin/lld
+      - ln -sf /app/llvm/bin/clang-cpp /app/bin/cpp
+      - ln -sf /app/llvm/bin/llvm-ar /app/bin/ar
+      - ln -sf /app/llvm/bin/llvm-objcopy /app/bin/objcopy
+    sources:
+      - type: script
+        dest-filename: launcher_wrapper.sh
+        commands:
+          - export CC=clang
+          - export CXX=clang++
+          - export IS_FLATPAK=1
+          - SM64APLauncher
+      - type: script
+        dest-filename: clang.sh
+        commands:
+          - |
+            #!/bin/sh
+            set -e
+            args=
+            link=1
+            for arg in "$@"; do
+              case "$arg" in
+                -c|-E|-S) link=0 ;;
+                -L/usr/lib/x86_64-linux-gnu) arg=-L/app/sysroot/usr/lib/x86_64-linux-gnu ;;
+              esac
+              if [ "$arg" = "-fzero-init-padding-bits=unions" ]; then
+                continue
+              fi
+              args="$args \"$arg\""
+            done
+            if [ "$link" -eq 1 ]; then
+              export LIBRARY_PATH=/app/sysroot/usr/lib:/app/sysroot/usr/lib/x86_64-linux-gnu:/app/sysroot/lib:/app/sysroot/lib64:/app/lib
+              eval exec /app/llvm/bin/clang --sysroot=/app/sysroot --gcc-toolchain=/app/sysroot/usr -idirafter /app/sysroot/usr/include -idirafter /app/sysroot/usr/include/x86_64-linux-gnu -L/app/lib -L/app/sysroot/usr/lib -L/app/sysroot/usr/lib/x86_64-linux-gnu -L/app/sysroot/lib -L/app/sysroot/lib64 -fuse-ld=lld $args
+            else
+              eval exec /app/llvm/bin/clang --sysroot=/app/sysroot --gcc-toolchain=/app/sysroot/usr -idirafter /app/sysroot/usr/include -idirafter /app/sysroot/usr/include/x86_64-linux-gnu $args
+            fi
+      - type: script
+        dest-filename: clang++.sh
+        commands:
+          - |
+            #!/bin/sh
+            set -e
+            args=
+            link=1
+            for arg in "$@"; do
+              case "$arg" in
+                -c|-E|-S) link=0 ;;
+                -L/usr/lib/x86_64-linux-gnu) arg=-L/app/sysroot/usr/lib/x86_64-linux-gnu ;;
+              esac
+              if [ "$arg" = "-fzero-init-padding-bits=unions" ]; then
+                continue
+              fi
+              args="$args \"$arg\""
+            done
+            if [ "$link" -eq 1 ]; then
+              export LIBRARY_PATH=/app/sysroot/usr/lib:/app/sysroot/usr/lib/x86_64-linux-gnu:/app/sysroot/lib:/app/sysroot/lib64:/app/lib
+              eval exec /app/llvm/bin/clang++ --sysroot=/app/sysroot --gcc-toolchain=/app/sysroot/usr -idirafter /app/sysroot/usr/include -idirafter /app/sysroot/usr/include/x86_64-linux-gnu -L/app/lib -L/app/sysroot/usr/lib -L/app/sysroot/usr/lib/x86_64-linux-gnu -L/app/sysroot/lib -L/app/sysroot/lib64 -fuse-ld=lld $args
+            else
+              eval exec /app/llvm/bin/clang++ --sysroot=/app/sysroot --gcc-toolchain=/app/sysroot/usr -idirafter /app/sysroot/usr/include -idirafter /app/sysroot/usr/include/x86_64-linux-gnu $args
+            fi
