@@ -11,8 +11,11 @@ finish-args:
   - --socket=pulseaudio
   - --filesystem=home
   - --share=network
-  - --device=input
-  - --device=dri
+# Annoyingly needed for older flatpak releases
+  - --device=all
+# Using below would be cleaner, but want to keep compat with Ubuntu LTS (noble, until May 2029)
+#  - --device=input
+#  - --device=dri
 modules:
   - name: git
     buildsystem: autotools
