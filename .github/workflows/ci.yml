@@ -82,7 +82,7 @@ jobs:
       with:
         name: SM64AP-Launcher_linux
         path: |
-          build/SM64AP_Launcher-x86_64.AppImage
+          build/SM64AP-Launcher-x86_64.AppImage
   
   build-mac:
     name: Build (macOS)
