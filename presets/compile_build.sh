@@ -3,8 +3,8 @@
 
 FULL_BUILD_PATH="${BUILD_TARGET_DIR}/${BUILD_NAME}"
 
-# Force MSYS2 compilers
-if [[ "${IS_FLATPAK}" != "1" ]]; then
+# Force MSYS2 compilers if on Windows
+if [[ -n "${MSYSTEM}" ]]; then
     export CC=/mingw64/bin/gcc
     export CXX=/mingw64/bin/g++
 fi
