@@ -1,13 +1,13 @@
 #include "BuildConfigurator.h"
 
-#include <QWidget>
-#include <QMainWindow>
+#include <QtWidgets/QWidget>
+#include <QtWidgets/QMainWindow>
 #include <Qt>
-#include <QFileDialog>
-#include <QPushButton>
-#include <QMessageBox>
-#include <QCoreApplication>
-#include <QFontDatabase>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QMessageBox>
+#include <QtCore/QCoreApplication>
+#include <QtGui/QFontDatabase>
 #include <functional>
 
 #include <string>

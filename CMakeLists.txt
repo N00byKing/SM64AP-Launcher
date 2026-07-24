@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 3.16)
 
 project(SM64AP-Launcher LANGUAGES CXX)
 
-set (CMAKE_CXX_STANDARD 11)
+set (CMAKE_CXX_STANDARD 17)
+set (CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Qt Setup
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
@@ -24,7 +25,7 @@ qt_add_executable(SM64APLauncher
 )
 
 # Linking
-target_link_libraries(SM64APLauncher PRIVATE Qt6::Core Qt6::Widgets)
+target_link_libraries(SM64APLauncher PUBLIC Qt6::Core Qt6::Widgets)
 target_include_directories(SM64APLauncher PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/inc)
 
 set_target_properties(SM64APLauncher PROPERTIES

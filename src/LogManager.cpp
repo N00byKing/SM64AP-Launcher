@@ -1,9 +1,9 @@
 #include "LogManager.h"
 
-#include <QMessageBox>
-#include <QFile>
-#include <QString>
-#include <QCoreApplication>
+#include <QtWidgets/QMessageBox>
+#include <QtCore/QFile>
+#include <QtCore/QString>
+#include <QtCore/QCoreApplication>
 
 #include "BuildConfigurator.h"
 #include "OutputWidget.h"

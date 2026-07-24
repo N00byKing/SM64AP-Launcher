@@ -1,15 +1,15 @@
 #include "ConfigManager.h"
 
-#include <QFile>
-#include <QDir>
-#include <QMessageBox>
-#include <QJsonDocument>
-#include <QCoreApplication>
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QStandardPaths>
-#include <QFileDialog>
-#include <QInputDialog>
+#include <QtCore/QFile>
+#include <QtCore/QDir>
+#include <QtWidgets/QMessageBox>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QCoreApplication>
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonArray>
+#include <QtCore/QStandardPaths>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QInputDialog>
 
 #include "LogManager.h"
 #include "version.h"
